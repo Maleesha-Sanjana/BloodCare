@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blood Donation Management System - Sri Lanka</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="drop-icon">🩸</span>
+      <span class="brand-text" data-i18n="brand">BloodConnect SL</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#home" data-i18n="nav_home">Home</a></li>
+      <li><a href="#register" data-i18n="nav_register">Register</a></li>
+      <li><a href="#search" data-i18n="nav_search">Find Donor</a></li>
+      <li><a href="#requests" data-i18n="nav_requests">Requests</a></li>
+      <li><a href="#notifications" data-i18n="nav_notifications">Alerts</a></li>
+    </ul>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('si')">සිං</button>
+      <button class="lang-btn" onclick="setLang('ta')">தமி</button>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1 data-i18n="hero_title">Blood Donation<br/><span>Management System</span></h1>
+      <p data-i18n="hero_sub">Connecting donors, hospitals, and patients across Sri Lanka</p>
+      <div class="hero-btns">
+        <a href="#register" class="btn btn-primary" data-i18n="hero_btn1">Register as Donor</a>
+        <a href="#search" class="btn btn-outline" data-i18n="hero_btn2">Find Blood</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <span class="stat-num" id="stat-donors">0</span>
+        <span class="stat-label" data-i18n="stat_donors">Donors Registered</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-requests">0</span>
+        <span class="stat-label" data-i18n="stat_requests">Active Requests</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="stat-saved">0</span>
+        <span class="stat-label" data-i18n="stat_saved">Lives Helped</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOOD GROUP QUICK SEARCH -->
+  <section class="quick-search">
+    <h2 data-i18n="qs_title">Quick Blood Search</h2>
+    <div class="blood-groups">
+      <button class="bg-btn" onclick="quickSearch('A+')">A+</button>
+      <button class="bg-btn" onclick="quickSearch('A-')">A-</button>
+      <button class="bg-btn" onclick="quickSearch('B+')">B+</button>
+      <button class="bg-btn" onclick="quickSearch('B-')">B-</button>
+      <button class="bg-btn" onclick="quickSearch('AB+')">AB+</button>
+      <button class="bg-btn" onclick="quickSearch('AB-')">AB-</button>
+      <button class="bg-btn" onclick="quickSearch('O+')">O+</button>
+      <button class="bg-btn" onclick="quickSearch('O-')">O-</button>
+    </div>
+  </section>
+
+  <!-- DONOR REGISTRATION -->
+  <section class="section" id="register">
+    <div class="section-header">
+      <h2 data-i18n="reg_title">Donor Registration</h2>
+      <p data-i18n="reg_sub">Join our network and help save lives</p>
+    </div>
+    <div class="form-card">
+      <form id="donorForm" onsubmit="registerDonor(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label data-i18n="form_name">Full Name</label>
+            <input type="text" id="dName" placeholder="Enter your full name" required />
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_age">Age</label>
+            <input type="number" id="dAge" min="18" max="65" placeholder="18-65" required />
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_blood">Blood Group</label>
+            <select id="dBlood" required>
+              <option value="">-- Select --</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_phone">Contact Number</label>
+            <input type="tel" id="dPhone" placeholder="+94 XX XXX XXXX" required />
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_location">District / Location</label>
+            <select id="dLocation" required>
+              <option value="">-- Select District --</option>
+              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+              <option>Kegalle</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_email">Email (optional)</label>
+            <input type="email" id="dEmail" placeholder="your@email.com" />
+          </div>
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="dConsent" required />
+          <label for="dConsent" data-i18n="form_consent">I consent to be contacted for blood donation requests</label>
+        </div>
+        <button type="submit" class="btn btn-primary full-width" data-i18n="form_submit">Register as Donor</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- DONOR SEARCH -->
+  <section class="section section-alt" id="search">
+    <div class="section-header">
+      <h2 data-i18n="search_title">Find a Blood Donor</h2>
+      <p data-i18n="search_sub">Search by blood group and location</p>
+    </div>
+    <div class="search-card">
+      <div class="search-filters">
+        <div class="form-group">
+          <label data-i18n="form_blood">Blood Group</label>
+          <select id="sBlood">
+            <option value="">All Groups</option>
+            <option>A+</option><option>A-</option>
+            <option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option>
+            <option>O+</option><option>O-</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n="form_location">District</label>
+          <select id="sLocation">
+            <option value="">All Districts</option>
+            <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+            <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+            <option>Galle</option><option>Matara</option><option>Hambantota</option>
+            <option>Jaffna</option><option>Batticaloa</option><option>Trincomalee</option>
+            <option>Kurunegala</option><option>Anuradhapura</option><option>Ratnapura</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="searchDonors()" data-i18n="search_btn">Search Donors</button>
+      </div>
+      <div id="searchResults" class="results-grid"></div>
+    </div>
+  </section>
+
+  <!-- DONATION REQUESTS -->
+  <section class="section" id="requests">
+    <div class="section-header">
+      <h2 data-i18n="req_title">Blood Donation Requests</h2>
+      <p data-i18n="req_sub">Hospitals can post urgent blood requests here</p>
+    </div>
+    <div class="two-col">
+      <!-- Post Request Form -->
+      <div class="form-card">
+        <h3 data-i18n="req_post">Post a Request</h3>
+        <form id="requestForm" onsubmit="postRequest(event)">
+          <div class="form-group">
+            <label data-i18n="req_hospital">Hospital Name</label>
+            <input type="text" id="rHospital" placeholder="e.g. Colombo National Hospital" required />
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_blood">Blood Group Needed</label>
+            <select id="rBlood" required>
+              <option value="">-- Select --</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_location">Location</label>
+            <select id="rLocation" required>
+              <option value="">-- Select District --</option>
+              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+              <option>Kandy</option><option>Matale</option><option>Galle</option>
+              <option>Jaffna</option><option>Batticaloa</option><option>Trincomalee</option>
+              <option>Kurunegala</option><option>Anuradhapura</option><option>Ratnapura</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="req_contact">Contact Number</label>
+            <input type="tel" id="rContact" placeholder="+94 XX XXX XXXX" required />
+          </div>
+          <div class="form-group">
+            <label data-i18n="req_level">Emergency Level</label>
+            <select id="rLevel" required>
+              <option value="">-- Select --</option>
+              <option value="critical" data-i18n="level_critical">🔴 Critical</option>
+              <option value="urgent" data-i18n="level_urgent">🟠 Urgent</option>
+              <option value="normal" data-i18n="level_normal">🟢 Normal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="req_units">Units Required</label>
+            <input type="number" id="rUnits" min="1" max="20" placeholder="Number of units" required />
+          </div>
+          <button type="submit" class="btn btn-danger full-width" data-i18n="req_submit">Post Request</button>
+        </form>
+      </div>
+
+      <!-- Active Requests List -->
+      <div>
+        <h3 data-i18n="req_active">Active Requests</h3>
+        <div id="requestsList" class="requests-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOTIFICATIONS -->
+  <section class="section section-alt" id="notifications">
+    <div class="section-header">
+      <h2 data-i18n="notif_title">Notification Center</h2>
+      <p data-i18n="notif_sub">Stay updated with blood donation alerts</p>
+    </div>
+    <div class="notif-container">
+      <div class="notif-controls">
+        <button class="btn btn-outline" onclick="filterNotif('all')" data-i18n="notif_all">All</button>
+        <button class="btn btn-outline" onclick="filterNotif('emergency')" data-i18n="notif_emergency">Emergency</button>
+        <button class="btn btn-outline" onclick="filterNotif('reminder')" data-i18n="notif_reminder">Reminders</button>
+        <button class="btn btn-outline" onclick="filterNotif('hospital')" data-i18n="notif_hospital">Hospital</button>
+        <button class="btn btn-sm btn-outline" onclick="clearNotifications()" data-i18n="notif_clear">Clear All</button>
+      </div>
+      <div id="notifList" class="notif-list"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="drop-icon">🩸</span>
+        <span data-i18n="brand">BloodConnect SL</span>
+      </div>
+      <p data-i18n="footer_text">Saving lives through technology — Sri Lanka's Blood Donation Network</p>
+      <p class="footer-small">© 2026 Blood Donation Management System for Sri Lanka</p>
+    </div>
+  </footer>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
