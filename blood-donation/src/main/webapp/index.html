@@ -76,124 +76,57 @@
       <h2 data-i18n="reg_title">Donor Registration</h2>
       <p data-i18n="reg_sub">Join our network and help save lives</p>
     </div>
-    <div class="reg-container">
-      <div class="form-card donor-form-card">
-        <h3 data-i18n="REGISTRATION FORM">Register as Donor</h3>
-        <form id="donorForm" onsubmit="registerDonor(event)">
-          <div class="form-group input-icon">
+    <div class="form-card">
+      <form id="donorForm" onsubmit="registerDonor(event)">
+        <div class="form-grid">
+          <div class="form-group">
             <label data-i18n="form_name">Full Name</label>
-            <div class="input-bar">
-              <span class="icon">👤</span>
-              <input type="text" id="dName" placeholder="Enter your full name" required />
-            </div>
+            <input type="text" id="dName" placeholder="Enter your full name" required />
           </div>
-
-          <div class="form-group input-icon">
+          <div class="form-group">
             <label data-i18n="form_age">Age</label>
-            <div class="input-bar">
-              <span class="icon">🎂</span>
-              <input type="number" id="dAge" min="18" max="65" placeholder="18-65" required />
-            </div>
+            <input type="number" id="dAge" min="18" max="65" placeholder="18-65" required />
           </div>
-
-          <div class="form-group input-icon">
+          <div class="form-group">
             <label data-i18n="form_blood">Blood Group</label>
-            <div class="input-bar">
-              <span class="icon">🩸</span>
-              <select id="dBlood" required>
-                <option value="">-- Select --</option>
-                <option>A+</option><option>A-</option>
-                <option>B+</option><option>B-</option>
-                <option>AB+</option><option>AB-</option>
-                <option>O+</option><option>O-</option>
-              </select>
-            </div>
+            <select id="dBlood" required>
+              <option value="">-- Select --</option>
+              <option>A+</option><option>A-</option>
+              <option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option>
+              <option>O+</option><option>O-</option>
+            </select>
           </div>
-
-          <div class="form-group input-icon">
+          <div class="form-group">
             <label data-i18n="form_phone">Contact Number</label>
-            <div class="input-bar">
-              <span class="icon">📞</span>
-              <input type="tel" id="dPhone" placeholder="+94 XX XXX XXXX" required />
-            </div>
+            <input type="tel" id="dPhone" placeholder="+94 XX XXX XXXX" required />
           </div>
-
-          <div class="form-group input-icon">
+          <div class="form-group">
             <label data-i18n="form_location">District / Location</label>
-            <div class="input-bar">
-              <span class="icon">📍</span>
-              <select id="dLocation" required>
-                <option value="">-- Select District --</option>
-                <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
-                <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
-                <option>Galle</option><option>Matara</option><option>Hambantota</option>
-                <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-                <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
-                <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
-                <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
-                <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
-                <option>Kegalle</option>
-              </select>
-            </div>
+            <select id="dLocation" required>
+              <option value="">-- Select District --</option>
+              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+              <option>Kegalle</option>
+            </select>
           </div>
-
-          <div class="form-group input-icon">
+          <div class="form-group">
             <label data-i18n="form_email">Email (optional)</label>
-            <div class="input-bar">
-              <span class="icon">✉️</span>
-              <input type="email" id="dEmail" placeholder="your@email.com" />
-            </div>
+            <input type="email" id="dEmail" placeholder="your@email.com" />
           </div>
-
-          <div class="form-group checkbox-group">
-            <input type="checkbox" id="dConsent" required />
-            <label for="dConsent" data-i18n="form_consent">I consent to be contacted for blood donation requests</label>
-          </div>
-
-          <button type="submit" class="btn btn-primary full-width" data-i18n="form_submit">Register as Donor</button>
-        </form>
-      </div>
-
-      <div class="reg-illustration" aria-hidden="true">
-        <svg viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
-          <!-- Background Circle -->
-          <circle cx="150" cy="200" r="140" fill="#fdecea" opacity="0.5"/>
-          
-          <!-- Heart Shape (Main) -->
-          <path d="M150 340 C80 280 40 240 40 180 C40 140 70 110 100 110 C120 110 135 120 150 135 C165 120 180 110 200 110 C230 110 260 140 260 180 C260 240 220 280 150 340 Z" 
-                fill="#c0392b" opacity="0.9"/>
-          
-          <!-- Blood Drop 1 (Right side, floating) -->
-          <ellipse cx="220" cy="120" rx="16" ry="24" fill="#e74c3c" opacity="0.8"/>
-          <circle cx="220" cy="95" r="12" fill="#e74c3c" opacity="0.8"/>
-          
-          <!-- Blood Drop 2 (Left side, floating) -->
-          <ellipse cx="80" cy="150" rx="14" ry="20" fill="#e74c3c" opacity="0.7"/>
-          <circle cx="80" cy="130" r="10" fill="#e74c3c" opacity="0.7"/>
-          
-          <!-- Person (simplified silhouette) -->
-          <circle cx="150" cy="80" r="22" fill="#96281b"/>
-          <rect x="130" y="110" width="40" height="50" fill="#96281b"/>
-          
-          <!-- Arms -->
-          <rect x="100" y="120" width="30" height="12" rx="6" fill="#96281b"/>
-          <rect x="170" y="120" width="30" height="12" rx="6" fill="#96281b"/>
-          
-          <!-- Plus Signs (Helper symbols) -->
-          <g fill="#c0392b" opacity="0.6">
-            <rect x="275" y="55" width="3" height="15"/>
-            <rect x="269" y="61" width="15" height="3"/>
-            <rect x="45" y="280" width="3" height="15"/>
-            <rect x="39" y="286" width="15" height="3"/>
-          </g>
-          
-          <!-- Stars (Hope/Life) -->
-          <g fill="#ffcdd2" opacity="0.7">
-            <polygon points="270,200 275,215 290,215 278,225 283,240 270,230 257,240 262,225 250,215 265,215"/>
-            <polygon points="60,100 63,110 75,110 65,117 68,127 60,120 52,127 55,117 45,110 57,110"/>
-          </g>
-        </svg>
-      </div>
+        </div>
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="dConsent" required />
+          <label for="dConsent" data-i18n="form_consent">I consent to be contacted for blood donation requests</label>
+        </div>
+        <button type="submit" class="btn btn-primary full-width" data-i18n="form_submit">Register as Donor</button>
+      </form>
     </div>
   </section>
 
@@ -308,50 +241,139 @@
     <div class="two-col">
       <!-- Post Request Form -->
       <div class="form-card">
-        <h3 data-i18n="POST A REQUEST">Post a Request</h3>
+        <h3 data-i18n="req_post">Post a Request</h3>
         <form id="requestForm" onsubmit="postRequest(event)">
           <div class="form-group">
             <label data-i18n="req_hospital">Hospital Name</label>
             <input type="text" id="rHospital" placeholder="e.g. Colombo National Hospital" required />
           </div>
+
+          <!-- Blood Group custom dropdown -->
           <div class="form-group">
             <label data-i18n="form_blood">Blood Group Needed</label>
-            <select id="rBlood" required>
+            <div class="custom-select-wrap" id="rBloodWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rBlood')">
+                <span class="cs-icon">🩸</span>
+                <span class="cs-value" id="rBloodValue">-- Select --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rBloodDropdown">
+                <div class="cs-option" data-value="A+"  onclick="pickReqBlood(this,'A+','A+')"><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+                <div class="cs-option" data-value="A-"  onclick="pickReqBlood(this,'A-','A−')"><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+                <div class="cs-option" data-value="B+"  onclick="pickReqBlood(this,'B+','B+')"><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+                <div class="cs-option" data-value="B-"  onclick="pickReqBlood(this,'B-','B−')"><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+                <div class="cs-option" data-value="AB+" onclick="pickReqBlood(this,'AB+','AB+')"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+                <div class="cs-option" data-value="AB-" onclick="pickReqBlood(this,'AB-','AB−')"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+                <div class="cs-option" data-value="O+"  onclick="pickReqBlood(this,'O+','O+')"><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+                <div class="cs-option" data-value="O-"  onclick="pickReqBlood(this,'O-','O−')"><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+              </div>
+            </div>
+            <select id="rBlood" style="display:none" required>
               <option value="">-- Select --</option>
-              <option>A+</option><option>A-</option>
-              <option>B+</option><option>B-</option>
-              <option>AB+</option><option>AB-</option>
-              <option>O+</option><option>O-</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
             </select>
           </div>
+
+          <!-- Location custom dropdown -->
           <div class="form-group">
             <label data-i18n="form_location">Location</label>
-            <select id="rLocation" required>
+            <div class="custom-select-wrap" id="rLocationWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLocation')">
+                <span class="cs-icon">📍</span>
+                <span class="cs-value" id="rLocationValue">-- Select District --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rLocationDropdown">
+                <div class="cs-search-wrap">
+                  <input type="text" class="cs-search" placeholder="Search district…" oninput="filterReqLocationOptions(this.value)" />
+                </div>
+                <div class="cs-options-list" id="rLocationOptionsList">
+                  <div class="cs-option" data-value="Colombo"      onclick="pickReqLocation(this,'Colombo')"><span class="cs-check"></span>Colombo</div>
+                  <div class="cs-option" data-value="Gampaha"      onclick="pickReqLocation(this,'Gampaha')"><span class="cs-check"></span>Gampaha</div>
+                  <div class="cs-option" data-value="Kalutara"     onclick="pickReqLocation(this,'Kalutara')"><span class="cs-check"></span>Kalutara</div>
+                  <div class="cs-option" data-value="Kandy"        onclick="pickReqLocation(this,'Kandy')"><span class="cs-check"></span>Kandy</div>
+                  <div class="cs-option" data-value="Matale"       onclick="pickReqLocation(this,'Matale')"><span class="cs-check"></span>Matale</div>
+                  <div class="cs-option" data-value="Nuwara Eliya" onclick="pickReqLocation(this,'Nuwara Eliya')"><span class="cs-check"></span>Nuwara Eliya</div>
+                  <div class="cs-option" data-value="Galle"        onclick="pickReqLocation(this,'Galle')"><span class="cs-check"></span>Galle</div>
+                  <div class="cs-option" data-value="Matara"       onclick="pickReqLocation(this,'Matara')"><span class="cs-check"></span>Matara</div>
+                  <div class="cs-option" data-value="Hambantota"   onclick="pickReqLocation(this,'Hambantota')"><span class="cs-check"></span>Hambantota</div>
+                  <div class="cs-option" data-value="Jaffna"       onclick="pickReqLocation(this,'Jaffna')"><span class="cs-check"></span>Jaffna</div>
+                  <div class="cs-option" data-value="Kilinochchi"  onclick="pickReqLocation(this,'Kilinochchi')"><span class="cs-check"></span>Kilinochchi</div>
+                  <div class="cs-option" data-value="Mannar"       onclick="pickReqLocation(this,'Mannar')"><span class="cs-check"></span>Mannar</div>
+                  <div class="cs-option" data-value="Vavuniya"     onclick="pickReqLocation(this,'Vavuniya')"><span class="cs-check"></span>Vavuniya</div>
+                  <div class="cs-option" data-value="Mullaitivu"   onclick="pickReqLocation(this,'Mullaitivu')"><span class="cs-check"></span>Mullaitivu</div>
+                  <div class="cs-option" data-value="Batticaloa"   onclick="pickReqLocation(this,'Batticaloa')"><span class="cs-check"></span>Batticaloa</div>
+                  <div class="cs-option" data-value="Ampara"       onclick="pickReqLocation(this,'Ampara')"><span class="cs-check"></span>Ampara</div>
+                  <div class="cs-option" data-value="Trincomalee"  onclick="pickReqLocation(this,'Trincomalee')"><span class="cs-check"></span>Trincomalee</div>
+                  <div class="cs-option" data-value="Kurunegala"   onclick="pickReqLocation(this,'Kurunegala')"><span class="cs-check"></span>Kurunegala</div>
+                  <div class="cs-option" data-value="Puttalam"     onclick="pickReqLocation(this,'Puttalam')"><span class="cs-check"></span>Puttalam</div>
+                  <div class="cs-option" data-value="Anuradhapura" onclick="pickReqLocation(this,'Anuradhapura')"><span class="cs-check"></span>Anuradhapura</div>
+                  <div class="cs-option" data-value="Polonnaruwa"  onclick="pickReqLocation(this,'Polonnaruwa')"><span class="cs-check"></span>Polonnaruwa</div>
+                  <div class="cs-option" data-value="Badulla"      onclick="pickReqLocation(this,'Badulla')"><span class="cs-check"></span>Badulla</div>
+                  <div class="cs-option" data-value="Monaragala"   onclick="pickReqLocation(this,'Monaragala')"><span class="cs-check"></span>Monaragala</div>
+                  <div class="cs-option" data-value="Ratnapura"    onclick="pickReqLocation(this,'Ratnapura')"><span class="cs-check"></span>Ratnapura</div>
+                  <div class="cs-option" data-value="Kegalle"      onclick="pickReqLocation(this,'Kegalle')"><span class="cs-check"></span>Kegalle</div>
+                </div>
+              </div>
+            </div>
+            <select id="rLocation" style="display:none" required>
               <option value="">-- Select District --</option>
               <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
-              <option>Kandy</option><option>Matale</option><option>Galle</option>
-              <option>Jaffna</option><option>Batticaloa</option><option>Trincomalee</option>
-              <option>Kurunegala</option><option>Anuradhapura</option><option>Ratnapura</option>
-              <option>Matara</option><option>Hambantota</option><option>Vavuniya</option>
-              <option>Nuwara Eliya</option><option>Kilinochchi</option><option>Mannar</option>
-              <option>Mullaitivu</option><option>Ampara</option>
-              <option>Polonnaruwa</option><option>Badulla</option><option>Monaragala</option> 
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
               <option>Kegalle</option>
             </select>
           </div>
+
           <div class="form-group">
             <label data-i18n="req_contact">Contact Number</label>
             <input type="tel" id="rContact" placeholder="+94 XX XXX XXXX" required />
           </div>
+
+          <!-- Emergency Level custom dropdown -->
           <div class="form-group">
             <label data-i18n="req_level">Emergency Level</label>
-            <select id="rLevel" required>
+            <div class="custom-select-wrap" id="rLevelWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLevel')">
+                <span class="cs-icon">⚡</span>
+                <span class="cs-value" id="rLevelValue">-- Select --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rLevelDropdown">
+                <div class="cs-option cs-level-critical" data-value="critical" onclick="pickReqLevel(this,'critical','🔴 Critical')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot critical"></span>
+                  <span>Critical</span>
+                  <span class="cs-level-desc">Immediate — life at risk</span>
+                </div>
+                <div class="cs-option cs-level-urgent" data-value="urgent" onclick="pickReqLevel(this,'urgent','🟠 Urgent')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot urgent"></span>
+                  <span>Urgent</span>
+                  <span class="cs-level-desc">Needed within hours</span>
+                </div>
+                <div class="cs-option cs-level-normal" data-value="normal" onclick="pickReqLevel(this,'normal','🟢 Normal')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot normal"></span>
+                  <span>Normal</span>
+                  <span class="cs-level-desc">Planned / non-emergency</span>
+                </div>
+              </div>
+            </div>
+            <select id="rLevel" style="display:none" required>
               <option value="">-- Select --</option>
-              <option value="critical" data-i18n="level_critical">🔴 Critical</option>
-              <option value="urgent" data-i18n="level_urgent">🟠 Urgent</option>
-              <option value="normal" data-i18n="level_normal">🟢 Normal</option>
+              <option value="critical">🔴 Critical</option>
+              <option value="urgent">🟠 Urgent</option>
+              <option value="normal">🟢 Normal</option>
             </select>
           </div>
+
           <div class="form-group">
             <label data-i18n="req_units">Units Required</label>
             <input type="number" id="rUnits" min="1" max="20" placeholder="Number of units" required />
