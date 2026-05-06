@@ -188,6 +188,7 @@ function postRequest(e) {
   });
 
   document.getElementById('requestForm').reset();
+  resetReqDropdowns();
   showToast(t('toast_request'), 'success');
   renderRequests();
   renderNotifications();
@@ -397,6 +398,86 @@ function filterLocationOptions(query) {
   document.querySelectorAll('#locationOptionsList .cs-option').forEach(o => {
     const text = o.textContent.toLowerCase();
     o.classList.toggle('cs-hidden', q !== '' && !text.includes(q));
+  });
+}
+
+// ===== POST REQUEST FORM DROPDOWNS =====
+function pickReqBlood(el, value, label) {
+  document.getElementById('rBlood').value = value;
+  document.getElementById('rBloodValue').textContent = label;
+  const wrap = document.getElementById('rBloodWrap');
+  wrap.classList.toggle('has-value', value !== '');
+  document.querySelectorAll('#rBloodDropdown .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  el.classList.add('cs-selected');
+  el.querySelector('.cs-check').textContent = '✓';
+  wrap.classList.remove('open');
+}
+
+function pickReqLocation(el, value) {
+  document.getElementById('rLocation').value = value;
+  document.getElementById('rLocationValue').textContent = value;
+  const wrap = document.getElementById('rLocationWrap');
+  wrap.classList.toggle('has-value', value !== '');
+  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  el.classList.add('cs-selected');
+  el.querySelector('.cs-check').textContent = '✓';
+  wrap.classList.remove('open');
+  const searchEl = document.querySelector('#rLocationDropdown .cs-search');
+  if (searchEl) { searchEl.value = ''; filterReqLocationOptions(''); }
+}
+
+function filterReqLocationOptions(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
+    const text = o.textContent.toLowerCase();
+    o.classList.toggle('cs-hidden', q !== '' && !text.includes(q));
+  });
+}
+
+function pickReqLevel(el, value, label) {
+  document.getElementById('rLevel').value = value;
+  document.getElementById('rLevelValue').textContent = label;
+  const wrap = document.getElementById('rLevelWrap');
+  wrap.classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
+  wrap.classList.add('has-value', 'level-' + value);
+  document.querySelectorAll('#rLevelDropdown .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  el.classList.add('cs-selected');
+  el.querySelector('.cs-check').textContent = '✓';
+  wrap.classList.remove('open');
+}
+
+// Reset request form custom dropdowns after submit
+function resetReqDropdowns() {
+  // Blood
+  document.getElementById('rBloodValue').textContent = '-- Select --';
+  document.getElementById('rBloodWrap').classList.remove('has-value');
+  document.querySelectorAll('#rBloodDropdown .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  // Location
+  document.getElementById('rLocationValue').textContent = '-- Select District --';
+  document.getElementById('rLocationWrap').classList.remove('has-value');
+  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  // Level
+  document.getElementById('rLevelValue').textContent = '-- Select --';
+  const lw = document.getElementById('rLevelWrap');
+  lw.classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
+  document.querySelectorAll('#rLevelDropdown .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
   });
 }
 
