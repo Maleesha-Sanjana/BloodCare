@@ -1,7 +1,7 @@
 // ===== TRANSLATIONS =====
 const translations = {
   en: {
-    brand: "BloodConnect SL",
+    brand: "BloodCare",
     nav_home: "Home",
     nav_register: "Register",
     nav_search: "Find Donor",
@@ -47,7 +47,7 @@ const translations = {
     notif_reminder: "Reminders",
     notif_hospital: "Hospital",
     notif_clear: "Clear All",
-    footer_text: "Saving lives through technology — Sri Lanka's Blood Donation Network",
+    footer_text: "Saving lives through technology — BloodCare Sri Lanka",
     toast_registered: "✅ Successfully registered as a donor!",
     toast_request: "🩸 Blood request posted successfully!",
     toast_respond: "📞 Contact details shown below.",
@@ -59,7 +59,7 @@ const translations = {
   },
 
   si: {
-    brand: "රුධිර සම්බන්ධතා SL",
+    brand: "BloodCare",
     nav_home: "මුල් පිටුව",
     nav_register: "ලියාපදිංචිය",
     nav_search: "දායකයා සොයන්න",
@@ -105,7 +105,7 @@ const translations = {
     notif_reminder: "මතක් කිරීම්",
     notif_hospital: "රෝහල",
     notif_clear: "සියල්ල ඉවත් කරන්න",
-    footer_text: "තාක්ෂණය හරහා ජීවිත බේරා ගැනීම — ශ්‍රී ලංකාවේ රුධිර දාන ජාලය",
+    footer_text: "ජීවිත බේරා ගැනීම — BloodCare ශ්‍රී ලංකාව",
     toast_registered: "✅ දායකයෙකු ලෙස සාර්ථකව ලියාපදිංචි විය!",
     toast_request: "🩸 රුධිර ඉල්ලීම සාර්ථකව පළ කරන ලදී!",
     toast_respond: "📞 සම්බන්ධතා විස්තර පහත දැක්වේ.",
@@ -117,7 +117,7 @@ const translations = {
   },
 
   ta: {
-    brand: "இரத்த இணைப்பு SL",
+    brand: "BloodCare",
     nav_home: "முகப்பு",
     nav_register: "பதிவு",
     nav_search: "நன்கொடையாளரை கண்டுபிடி",
@@ -163,7 +163,7 @@ const translations = {
     notif_reminder: "நினைவூட்டல்கள்",
     notif_hospital: "மருத்துவமனை",
     notif_clear: "அனைத்தையும் அழி",
-    footer_text: "தொழில்நுட்பம் மூலம் உயிர்களை காப்பாற்றுதல் — இலங்கையின் இரத்த தான நெட்வொர்க்",
+    footer_text: "உயிர்களை காப்பாற்றுதல் — BloodCare இலங்கை",
     toast_registered: "✅ நன்கொடையாளராக வெற்றிகரமாக பதிவு செய்யப்பட்டது!",
     toast_request: "🩸 இரத்த கோரிக்கை வெற்றிகரமாக இடப்பட்டது!",
     toast_respond: "📞 தொடர்பு விவரங்கள் கீழே காட்டப்படுகின்றன.",

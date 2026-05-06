@@ -340,7 +340,67 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ===== INIT =====
+// ===== CUSTOM DROPDOWNS (Search section) =====
+function toggleDropdown(which) {
+  const wrap = document.getElementById(which + 'Wrap');
+  const isOpen = wrap.classList.contains('open');
+  // close all first
+  document.querySelectorAll('.custom-select-wrap').forEach(w => w.classList.remove('open'));
+  if (!isOpen) wrap.classList.add('open');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.custom-select-wrap')) {
+    document.querySelectorAll('.custom-select-wrap').forEach(w => w.classList.remove('open'));
+  }
+});
+
+function pickBlood(el, value, label) {
+  // update hidden select
+  document.getElementById('sBlood').value = value;
+  // update trigger label
+  document.getElementById('bloodValue').textContent = label;
+  // toggle has-value
+  const wrap = document.getElementById('bloodWrap');
+  wrap.classList.toggle('has-value', value !== '');
+  // mark selected
+  document.querySelectorAll('#bloodDropdown .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  el.classList.add('cs-selected');
+  el.querySelector('.cs-check').textContent = '✓';
+  // close
+  wrap.classList.remove('open');
+}
+
+function pickLocation(el, value, label) {
+  document.getElementById('sLocation').value = value;
+  document.getElementById('locationValue').textContent = label;
+  const wrap = document.getElementById('locationWrap');
+  wrap.classList.toggle('has-value', value !== '');
+  document.querySelectorAll('#locationOptionsList .cs-option').forEach(o => {
+    o.classList.remove('cs-selected');
+    o.querySelector('.cs-check').textContent = '';
+  });
+  el.classList.add('cs-selected');
+  el.querySelector('.cs-check').textContent = '✓';
+  wrap.classList.remove('open');
+  // clear search input
+  const searchEl = document.querySelector('#locationDropdown .cs-search');
+  if (searchEl) { searchEl.value = ''; filterLocationOptions(''); }
+}
+
+function filterLocationOptions(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#locationOptionsList .cs-option').forEach(o => {
+    const text = o.textContent.toLowerCase();
+    o.classList.toggle('cs-hidden', q !== '' && !text.includes(q));
+  });
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   seedSampleData();
   updateStats();

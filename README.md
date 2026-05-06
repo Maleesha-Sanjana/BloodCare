@@ -1,4 +1,4 @@
-# 🩸 Blood Donation Management System — Sri Lanka
+# 🩸 BloodCare — Blood Donation Management System Sri Lanka
 
 A web-based Blood Donation Management System designed for Sri Lanka to connect blood donors with hospitals and patients. Built with pure HTML, CSS, and JavaScript.
 
@@ -107,4 +107,4 @@ Presented by:
 
 ---
 
-*Saving lives through technology — Sri Lanka's Blood Donation Network* 🩸
+*BloodCare — Saving lives through technology, Sri Lanka* 🩸

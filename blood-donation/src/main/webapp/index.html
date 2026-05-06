@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blood Donation Management System - Sri Lanka</title>
+  <title>BloodCare - Blood Donation Management System Sri Lanka</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -12,7 +12,7 @@
   <nav class="navbar">
     <div class="nav-brand">
       <span class="drop-icon">🩸</span>
-      <span class="brand-text" data-i18n="brand">BloodConnect SL</span>
+      <span class="brand-text" data-i18n="brand">BloodCare</span>
     </div>
     <ul class="nav-links">
       <li><a href="#home" data-i18n="nav_home">Home</a></li>
@@ -138,28 +138,95 @@
     </div>
     <div class="search-card">
       <div class="search-filters">
+
+        <!-- Blood Group custom dropdown -->
         <div class="form-group">
           <label data-i18n="form_blood">Blood Group</label>
-          <select id="sBlood">
+          <div class="custom-select-wrap" id="bloodWrap">
+            <button type="button" class="custom-select-trigger" id="bloodTrigger" onclick="toggleDropdown('blood')">
+              <span class="cs-icon">🩸</span>
+              <span class="cs-value" id="bloodValue">All Groups</span>
+              <span class="cs-arrow">▾</span>
+            </button>
+            <div class="custom-select-dropdown" id="bloodDropdown">
+              <div class="cs-option cs-selected" data-value="" onclick="pickBlood(this, '', 'All Groups')">
+                <span class="cs-check">✓</span> All Groups
+              </div>
+              <div class="cs-option" data-value="A+"  onclick="pickBlood(this, 'A+',  'A+')"><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+              <div class="cs-option" data-value="A-"  onclick="pickBlood(this, 'A-',  'A−')"><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+              <div class="cs-option" data-value="B+"  onclick="pickBlood(this, 'B+',  'B+')"><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+              <div class="cs-option" data-value="B-"  onclick="pickBlood(this, 'B-',  'B−')"><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+              <div class="cs-option" data-value="AB+" onclick="pickBlood(this, 'AB+', 'AB+')"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+              <div class="cs-option" data-value="AB-" onclick="pickBlood(this, 'AB-', 'AB−')"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+              <div class="cs-option" data-value="O+"  onclick="pickBlood(this, 'O+',  'O+')"><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+              <div class="cs-option" data-value="O-"  onclick="pickBlood(this, 'O-',  'O−')"><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+            </div>
+          </div>
+          <select id="sBlood" style="display:none">
             <option value="">All Groups</option>
-            <option>A+</option><option>A-</option>
-            <option>B+</option><option>B-</option>
-            <option>AB+</option><option>AB-</option>
-            <option>O+</option><option>O-</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
           </select>
         </div>
+
+        <!-- District / Location custom dropdown -->
         <div class="form-group">
-          <label data-i18n="form_location">District</label>
-          <select id="sLocation">
+          <label data-i18n="form_location">District / Location</label>
+          <div class="custom-select-wrap" id="locationWrap">
+            <button type="button" class="custom-select-trigger" id="locationTrigger" onclick="toggleDropdown('location')">
+              <span class="cs-icon">📍</span>
+              <span class="cs-value" id="locationValue">All Districts</span>
+              <span class="cs-arrow">▾</span>
+            </button>
+            <div class="custom-select-dropdown" id="locationDropdown">
+              <div class="cs-search-wrap">
+                <input type="text" class="cs-search" placeholder="Search district…" oninput="filterLocationOptions(this.value)" />
+              </div>
+              <div class="cs-options-list" id="locationOptionsList">
+                <div class="cs-option cs-selected" data-value="" onclick="pickLocation(this, '', 'All Districts')"><span class="cs-check">✓</span> All Districts</div>
+                <div class="cs-option" data-value="Colombo"      onclick="pickLocation(this,'Colombo','Colombo')"><span class="cs-check"></span>Colombo</div>
+                <div class="cs-option" data-value="Gampaha"      onclick="pickLocation(this,'Gampaha','Gampaha')"><span class="cs-check"></span>Gampaha</div>
+                <div class="cs-option" data-value="Kalutara"     onclick="pickLocation(this,'Kalutara','Kalutara')"><span class="cs-check"></span>Kalutara</div>
+                <div class="cs-option" data-value="Kandy"        onclick="pickLocation(this,'Kandy','Kandy')"><span class="cs-check"></span>Kandy</div>
+                <div class="cs-option" data-value="Matale"       onclick="pickLocation(this,'Matale','Matale')"><span class="cs-check"></span>Matale</div>
+                <div class="cs-option" data-value="Nuwara Eliya" onclick="pickLocation(this,'Nuwara Eliya','Nuwara Eliya')"><span class="cs-check"></span>Nuwara Eliya</div>
+                <div class="cs-option" data-value="Galle"        onclick="pickLocation(this,'Galle','Galle')"><span class="cs-check"></span>Galle</div>
+                <div class="cs-option" data-value="Matara"       onclick="pickLocation(this,'Matara','Matara')"><span class="cs-check"></span>Matara</div>
+                <div class="cs-option" data-value="Hambantota"   onclick="pickLocation(this,'Hambantota','Hambantota')"><span class="cs-check"></span>Hambantota</div>
+                <div class="cs-option" data-value="Jaffna"       onclick="pickLocation(this,'Jaffna','Jaffna')"><span class="cs-check"></span>Jaffna</div>
+                <div class="cs-option" data-value="Kilinochchi"  onclick="pickLocation(this,'Kilinochchi','Kilinochchi')"><span class="cs-check"></span>Kilinochchi</div>
+                <div class="cs-option" data-value="Mannar"       onclick="pickLocation(this,'Mannar','Mannar')"><span class="cs-check"></span>Mannar</div>
+                <div class="cs-option" data-value="Vavuniya"     onclick="pickLocation(this,'Vavuniya','Vavuniya')"><span class="cs-check"></span>Vavuniya</div>
+                <div class="cs-option" data-value="Mullaitivu"   onclick="pickLocation(this,'Mullaitivu','Mullaitivu')"><span class="cs-check"></span>Mullaitivu</div>
+                <div class="cs-option" data-value="Batticaloa"   onclick="pickLocation(this,'Batticaloa','Batticaloa')"><span class="cs-check"></span>Batticaloa</div>
+                <div class="cs-option" data-value="Ampara"       onclick="pickLocation(this,'Ampara','Ampara')"><span class="cs-check"></span>Ampara</div>
+                <div class="cs-option" data-value="Trincomalee"  onclick="pickLocation(this,'Trincomalee','Trincomalee')"><span class="cs-check"></span>Trincomalee</div>
+                <div class="cs-option" data-value="Kurunegala"   onclick="pickLocation(this,'Kurunegala','Kurunegala')"><span class="cs-check"></span>Kurunegala</div>
+                <div class="cs-option" data-value="Puttalam"     onclick="pickLocation(this,'Puttalam','Puttalam')"><span class="cs-check"></span>Puttalam</div>
+                <div class="cs-option" data-value="Anuradhapura" onclick="pickLocation(this,'Anuradhapura','Anuradhapura')"><span class="cs-check"></span>Anuradhapura</div>
+                <div class="cs-option" data-value="Polonnaruwa"  onclick="pickLocation(this,'Polonnaruwa','Polonnaruwa')"><span class="cs-check"></span>Polonnaruwa</div>
+                <div class="cs-option" data-value="Badulla"      onclick="pickLocation(this,'Badulla','Badulla')"><span class="cs-check"></span>Badulla</div>
+                <div class="cs-option" data-value="Monaragala"   onclick="pickLocation(this,'Monaragala','Monaragala')"><span class="cs-check"></span>Monaragala</div>
+                <div class="cs-option" data-value="Ratnapura"    onclick="pickLocation(this,'Ratnapura','Ratnapura')"><span class="cs-check"></span>Ratnapura</div>
+                <div class="cs-option" data-value="Kegalle"      onclick="pickLocation(this,'Kegalle','Kegalle')"><span class="cs-check"></span>Kegalle</div>
+              </div>
+            </div>
+          </div>
+          <select id="sLocation" style="display:none">
             <option value="">All Districts</option>
             <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
             <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
             <option>Galle</option><option>Matara</option><option>Hambantota</option>
-            <option>Jaffna</option><option>Batticaloa</option><option>Trincomalee</option>
-            <option>Kurunegala</option><option>Anuradhapura</option><option>Ratnapura</option>
+            <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+            <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+            <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+            <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+            <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+            <option>Kegalle</option>
           </select>
         </div>
-        <button class="btn btn-primary" onclick="searchDonors()" data-i18n="search_btn">Search Donors</button>
+
+        <button class="btn btn-primary search-submit-btn" onclick="searchDonors()" data-i18n="search_btn">Search Donors</button>
       </div>
       <div id="searchResults" class="results-grid"></div>
     </div>
@@ -252,7 +319,7 @@
     <div class="footer-content">
       <div class="footer-brand">
         <span class="drop-icon">🩸</span>
-        <span data-i18n="brand">BloodConnect SL</span>
+        <span data-i18n="brand">BloodCare</span>
       </div>
       <p data-i18n="footer_text">Saving lives through technology — Sri Lanka's Blood Donation Network</p>
       <p class="footer-small">© 2026 Blood Donation Management System for Sri Lanka</p>
