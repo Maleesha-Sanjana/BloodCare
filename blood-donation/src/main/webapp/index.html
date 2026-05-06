@@ -247,39 +247,133 @@
             <label data-i18n="req_hospital">Hospital Name</label>
             <input type="text" id="rHospital" placeholder="e.g. Colombo National Hospital" required />
           </div>
+
+          <!-- Blood Group custom dropdown -->
           <div class="form-group">
             <label data-i18n="form_blood">Blood Group Needed</label>
-            <select id="rBlood" required>
+            <div class="custom-select-wrap" id="rBloodWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rBlood')">
+                <span class="cs-icon">🩸</span>
+                <span class="cs-value" id="rBloodValue">-- Select --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rBloodDropdown">
+                <div class="cs-option" data-value="A+"  onclick="pickReqBlood(this,'A+','A+')"><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+                <div class="cs-option" data-value="A-"  onclick="pickReqBlood(this,'A-','A−')"><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+                <div class="cs-option" data-value="B+"  onclick="pickReqBlood(this,'B+','B+')"><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+                <div class="cs-option" data-value="B-"  onclick="pickReqBlood(this,'B-','B−')"><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+                <div class="cs-option" data-value="AB+" onclick="pickReqBlood(this,'AB+','AB+')"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+                <div class="cs-option" data-value="AB-" onclick="pickReqBlood(this,'AB-','AB−')"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+                <div class="cs-option" data-value="O+"  onclick="pickReqBlood(this,'O+','O+')"><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+                <div class="cs-option" data-value="O-"  onclick="pickReqBlood(this,'O-','O−')"><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+              </div>
+            </div>
+            <select id="rBlood" style="display:none" required>
               <option value="">-- Select --</option>
-              <option>A+</option><option>A-</option>
-              <option>B+</option><option>B-</option>
-              <option>AB+</option><option>AB-</option>
-              <option>O+</option><option>O-</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
             </select>
           </div>
+
+          <!-- Location custom dropdown -->
           <div class="form-group">
             <label data-i18n="form_location">Location</label>
-            <select id="rLocation" required>
+            <div class="custom-select-wrap" id="rLocationWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLocation')">
+                <span class="cs-icon">📍</span>
+                <span class="cs-value" id="rLocationValue">-- Select District --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rLocationDropdown">
+                <div class="cs-search-wrap">
+                  <input type="text" class="cs-search" placeholder="Search district…" oninput="filterReqLocationOptions(this.value)" />
+                </div>
+                <div class="cs-options-list" id="rLocationOptionsList">
+                  <div class="cs-option" data-value="Colombo"      onclick="pickReqLocation(this,'Colombo')"><span class="cs-check"></span>Colombo</div>
+                  <div class="cs-option" data-value="Gampaha"      onclick="pickReqLocation(this,'Gampaha')"><span class="cs-check"></span>Gampaha</div>
+                  <div class="cs-option" data-value="Kalutara"     onclick="pickReqLocation(this,'Kalutara')"><span class="cs-check"></span>Kalutara</div>
+                  <div class="cs-option" data-value="Kandy"        onclick="pickReqLocation(this,'Kandy')"><span class="cs-check"></span>Kandy</div>
+                  <div class="cs-option" data-value="Matale"       onclick="pickReqLocation(this,'Matale')"><span class="cs-check"></span>Matale</div>
+                  <div class="cs-option" data-value="Nuwara Eliya" onclick="pickReqLocation(this,'Nuwara Eliya')"><span class="cs-check"></span>Nuwara Eliya</div>
+                  <div class="cs-option" data-value="Galle"        onclick="pickReqLocation(this,'Galle')"><span class="cs-check"></span>Galle</div>
+                  <div class="cs-option" data-value="Matara"       onclick="pickReqLocation(this,'Matara')"><span class="cs-check"></span>Matara</div>
+                  <div class="cs-option" data-value="Hambantota"   onclick="pickReqLocation(this,'Hambantota')"><span class="cs-check"></span>Hambantota</div>
+                  <div class="cs-option" data-value="Jaffna"       onclick="pickReqLocation(this,'Jaffna')"><span class="cs-check"></span>Jaffna</div>
+                  <div class="cs-option" data-value="Kilinochchi"  onclick="pickReqLocation(this,'Kilinochchi')"><span class="cs-check"></span>Kilinochchi</div>
+                  <div class="cs-option" data-value="Mannar"       onclick="pickReqLocation(this,'Mannar')"><span class="cs-check"></span>Mannar</div>
+                  <div class="cs-option" data-value="Vavuniya"     onclick="pickReqLocation(this,'Vavuniya')"><span class="cs-check"></span>Vavuniya</div>
+                  <div class="cs-option" data-value="Mullaitivu"   onclick="pickReqLocation(this,'Mullaitivu')"><span class="cs-check"></span>Mullaitivu</div>
+                  <div class="cs-option" data-value="Batticaloa"   onclick="pickReqLocation(this,'Batticaloa')"><span class="cs-check"></span>Batticaloa</div>
+                  <div class="cs-option" data-value="Ampara"       onclick="pickReqLocation(this,'Ampara')"><span class="cs-check"></span>Ampara</div>
+                  <div class="cs-option" data-value="Trincomalee"  onclick="pickReqLocation(this,'Trincomalee')"><span class="cs-check"></span>Trincomalee</div>
+                  <div class="cs-option" data-value="Kurunegala"   onclick="pickReqLocation(this,'Kurunegala')"><span class="cs-check"></span>Kurunegala</div>
+                  <div class="cs-option" data-value="Puttalam"     onclick="pickReqLocation(this,'Puttalam')"><span class="cs-check"></span>Puttalam</div>
+                  <div class="cs-option" data-value="Anuradhapura" onclick="pickReqLocation(this,'Anuradhapura')"><span class="cs-check"></span>Anuradhapura</div>
+                  <div class="cs-option" data-value="Polonnaruwa"  onclick="pickReqLocation(this,'Polonnaruwa')"><span class="cs-check"></span>Polonnaruwa</div>
+                  <div class="cs-option" data-value="Badulla"      onclick="pickReqLocation(this,'Badulla')"><span class="cs-check"></span>Badulla</div>
+                  <div class="cs-option" data-value="Monaragala"   onclick="pickReqLocation(this,'Monaragala')"><span class="cs-check"></span>Monaragala</div>
+                  <div class="cs-option" data-value="Ratnapura"    onclick="pickReqLocation(this,'Ratnapura')"><span class="cs-check"></span>Ratnapura</div>
+                  <div class="cs-option" data-value="Kegalle"      onclick="pickReqLocation(this,'Kegalle')"><span class="cs-check"></span>Kegalle</div>
+                </div>
+              </div>
+            </div>
+            <select id="rLocation" style="display:none" required>
               <option value="">-- Select District --</option>
               <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
-              <option>Kandy</option><option>Matale</option><option>Galle</option>
-              <option>Jaffna</option><option>Batticaloa</option><option>Trincomalee</option>
-              <option>Kurunegala</option><option>Anuradhapura</option><option>Ratnapura</option>
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+              <option>Kegalle</option>
             </select>
           </div>
+
           <div class="form-group">
             <label data-i18n="req_contact">Contact Number</label>
             <input type="tel" id="rContact" placeholder="+94 XX XXX XXXX" required />
           </div>
+
+          <!-- Emergency Level custom dropdown -->
           <div class="form-group">
             <label data-i18n="req_level">Emergency Level</label>
-            <select id="rLevel" required>
+            <div class="custom-select-wrap" id="rLevelWrap">
+              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLevel')">
+                <span class="cs-icon">⚡</span>
+                <span class="cs-value" id="rLevelValue">-- Select --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="rLevelDropdown">
+                <div class="cs-option cs-level-critical" data-value="critical" onclick="pickReqLevel(this,'critical','🔴 Critical')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot critical"></span>
+                  <span>Critical</span>
+                  <span class="cs-level-desc">Immediate — life at risk</span>
+                </div>
+                <div class="cs-option cs-level-urgent" data-value="urgent" onclick="pickReqLevel(this,'urgent','🟠 Urgent')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot urgent"></span>
+                  <span>Urgent</span>
+                  <span class="cs-level-desc">Needed within hours</span>
+                </div>
+                <div class="cs-option cs-level-normal" data-value="normal" onclick="pickReqLevel(this,'normal','🟢 Normal')">
+                  <span class="cs-check"></span>
+                  <span class="cs-level-dot normal"></span>
+                  <span>Normal</span>
+                  <span class="cs-level-desc">Planned / non-emergency</span>
+                </div>
+              </div>
+            </div>
+            <select id="rLevel" style="display:none" required>
               <option value="">-- Select --</option>
-              <option value="critical" data-i18n="level_critical">🔴 Critical</option>
-              <option value="urgent" data-i18n="level_urgent">🟠 Urgent</option>
-              <option value="normal" data-i18n="level_normal">🟢 Normal</option>
+              <option value="critical">🔴 Critical</option>
+              <option value="urgent">🟠 Urgent</option>
+              <option value="normal">🟢 Normal</option>
             </select>
           </div>
+
           <div class="form-group">
             <label data-i18n="req_units">Units Required</label>
             <input type="number" id="rUnits" min="1" max="20" placeholder="Number of units" required />
