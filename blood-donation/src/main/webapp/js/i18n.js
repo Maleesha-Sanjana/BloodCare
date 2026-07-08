@@ -337,3 +337,7 @@ function applyTranslations() {
 }
 
 document.addEventListener('DOMContentLoaded', applyTranslations);
+
+window.setLang = setLang;
+window.t = t;
+window.applyTranslations = applyTranslations;
