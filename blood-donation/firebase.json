@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "BloodCare",
+        "supportEmail": "bloodcaree123@gmail.com"
+      }
+    }
+  }
+}

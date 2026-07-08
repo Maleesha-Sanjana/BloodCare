@@ -72,33 +72,47 @@ function updateStats() {
 // ===== DONOR REGISTRATION =====
 function registerDonor(e) {
   e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) {
+    openAuthModal('signup');
+    return;
+  }
+
   const donor = {
     id:       Date.now(),
+    uid:      user.uid,
     name:     document.getElementById('dName').value.trim(),
     age:      parseInt(document.getElementById('dAge').value),
     blood:    document.getElementById('dBlood').value,
     phone:    document.getElementById('dPhone').value.trim(),
     location: document.getElementById('dLocation').value,
-    email:    document.getElementById('dEmail').value.trim(),
+    email:    user.email,
     date:     new Date().toISOString().split('T')[0],
   };
 
   const donors = loadData(DONORS_KEY);
-  donors.push(donor);
-  saveData(DONORS_KEY, donors);
-
-  // Add notification
-  addNotification({
-    type: 'hospital',
-    icon: '✅',
-    title: 'New Donor Registered',
-    msg: `${donor.name} (${donor.blood}) from ${donor.location} has joined the network.`,
-    time: 'Just now',
-    read: false,
-  });
+  const existing = donors.findIndex(d => d.uid === user.uid);
+  if (existing >= 0) {
+    donors[existing] = { ...donors[existing], ...donor, id: donors[existing].id };
+    saveData(DONORS_KEY, donors);
+    showToast(t('toast_updated'), 'success');
+  } else {
+    donors.push(donor);
+    saveData(DONORS_KEY, donors);
+    addNotification({
+      type: 'hospital',
+      icon: '✅',
+      title: 'New Donor Registered',
+      msg: `${donor.name} (${donor.blood}) from ${donor.location} has joined the network.`,
+      time: 'Just now',
+      read: false,
+    });
+    showToast(t('toast_registered'), 'success');
+  }
 
   document.getElementById('donorForm').reset();
-  showToast(t('toast_registered'), 'success');
+  prefillDonorForm(user);
   updateStats();
   renderNotifications();
 }
