@@ -9,11 +9,17 @@ const AUTH_ERRORS = {
   'auth/wrong-password':      'auth_err_wrong_password',
   'auth/invalid-credential':  'auth_err_invalid_credential',
   'auth/popup-closed-by-user':'auth_err_popup_closed',
+  'auth/popup-blocked':       'auth_err_popup_blocked',
+  'auth/unauthorized-domain': 'auth_err_unauthorized_domain',
+  'auth/cancelled-popup-request': 'auth_err_popup_closed',
   'auth/too-many-requests':   'auth_err_too_many',
 };
 
 function authErrorMessage(code) {
   const key = AUTH_ERRORS[code];
+  if (key === 'auth_err_unauthorized_domain') {
+    return t(key).replace('{domain}', location.hostname);
+  }
   return key ? t(key) : t('auth_err_generic');
 }
 
@@ -156,19 +162,67 @@ async function signInWithEmail(e) {
   }
 }
 
+function setGoogleLoading(loading) {
+  document.querySelectorAll('.btn-google').forEach(btn => {
+    btn.disabled = loading;
+    const label = btn.querySelector('span[data-i18n="auth_google"]') || btn.querySelector('span:last-child');
+    if (label) {
+      if (!btn.dataset.defaultLabel) btn.dataset.defaultLabel = label.textContent;
+      label.textContent = loading ? t('auth_loading') : btn.dataset.defaultLabel;
+    }
+  });
+}
+
+function onGoogleSignInSuccess() {
+  closeAuthModal();
+  showToast(t('auth_toast_google'), 'success');
+  document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+}
+
 async function signInWithGoogle() {
   clearAuthErrors();
+  setGoogleLoading(true);
+
   const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
   try {
-    await auth.signInWithPopup(provider);
-    closeAuthModal();
-    showToast(t('auth_toast_google'), 'success');
-    document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+    const result = await auth.signInWithPopup(provider);
+    if (result.user) onGoogleSignInSuccess();
   } catch (err) {
-    if (err.code !== 'auth/popup-closed-by-user') {
-      showAuthError(authErrorMessage(err.code));
+    console.error('Google sign-in:', err.code, err.message);
+
+    // Fallback to full-page redirect if popup is blocked or closed
+    if (['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(err.code)) {
+      try {
+        await auth.signInWithRedirect(provider);
+        return;
+      } catch (redirectErr) {
+        showAuthError(authErrorMessage(redirectErr.code) || redirectErr.message);
+        openAuthModal('signin');
+      }
+    } else {
+      showAuthError(authErrorMessage(err.code) || err.message);
+      openAuthModal('signin');
     }
+  } finally {
+    setGoogleLoading(false);
   }
+}
+
+function handleGoogleRedirectResult() {
+  setGoogleLoading(false);
+  auth.getRedirectResult()
+    .then((result) => {
+      if (result && result.user) onGoogleSignInSuccess();
+    })
+    .catch((err) => {
+      if (err && err.code) {
+        console.error('Google redirect:', err.code, err.message);
+        showAuthError(authErrorMessage(err.code) || err.message);
+        openAuthModal('signin');
+      }
+    });
 }
 
 async function signOut() {
@@ -185,6 +239,8 @@ async function signOut() {
 auth.onAuthStateChanged(user => {
   updateAuthUI(user);
 });
+
+handleGoogleRedirectResult();
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeAuthModal();

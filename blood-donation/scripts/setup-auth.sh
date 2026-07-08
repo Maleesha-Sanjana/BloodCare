@@ -15,7 +15,7 @@ else
   echo "    Web app already exists, skipping."
 fi
 
-echo "==> Deploying auth providers (email/password + Google)"
+echo "==> Deploying auth providers + authorized domains"
 firebase deploy --only auth --project bloodcare-5a516
 
 echo "==> Fetching SDK config into firebase-config.js"

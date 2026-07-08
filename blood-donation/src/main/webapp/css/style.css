@@ -1115,6 +1115,12 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+.btn-google:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
