@@ -88,6 +88,8 @@ const translations = {
     auth_err_generic: "Authentication failed. Please try again.",
     form_email: "Email",
     toast_updated: "✅ Donor profile updated!",
+    welcome_msg: "Thank you for joining BloodCare. You're now part of Sri Lanka's blood donation network — ready to help save lives.",
+    welcome_view_requests: "View Blood Requests",
   },
 
   si: {
@@ -178,6 +180,8 @@ const translations = {
     auth_err_too_many: "උත්සාහයන් වැඩිය. පසුව නැවත උත්සාහ කරන්න.",
     auth_err_generic: "සත්‍යාපනය අසාර්ථක විය. නැවත උත්සාහ කරන්න.",
     toast_updated: "✅ දායක පැතිකඩ යාවත්කාලීන කරන ලදී!",
+    welcome_msg: "BloodCare වෙත සම්බන්ධ වූ ඔබට ස්තූතියි. ඔබ දැන් ශ්‍රී ලංකාවේ රුධිර දාන ජාලයේ සාමාජිකයෙකි — ජීවිත බේරා ගැනීමට සූදානම්.",
+    welcome_view_requests: "රුධිර ඉල්ලීම් බලන්න",
   },
 
   ta: {
@@ -268,6 +272,8 @@ const translations = {
     auth_err_too_many: "பல முயற்சிகள். பின்னர் மீண்டும் முயற்சிக்கவும்.",
     auth_err_generic: "அங்கீகாரம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.",
     toast_updated: "✅ நன்கொடையாளர் சுயவிவரம் புதுப்பிக்கப்பட்டது!",
+    welcome_msg: "BloodCare இல் சேர்ந்ததற்கு நன்றி. நீங்கள் இப்போது இலங்கையின் இரத்த தான நெட்வொர்க்கின் ஒரு பகுதியாக உள்ளீர்கள் — உயிர்களை காப்பாற்ற தயாராக உள்ளீர்கள்.",
+    welcome_view_requests: "இரத்த கோரிக்கைகளை பார்",
   }
 };
 

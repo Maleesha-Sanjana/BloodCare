@@ -37,7 +37,7 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 1rem;
   padding: 0 2rem;
   height: 64px;
 }
@@ -49,6 +49,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--red);
+  flex-shrink: 0;
 }
 
 .drop-icon { font-size: 1.4rem; }
@@ -57,6 +58,16 @@ a { text-decoration: none; color: inherit; }
   display: flex;
   list-style: none;
   gap: 0.25rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .nav-links a {
@@ -75,7 +86,7 @@ a { text-decoration: none; color: inherit; }
 
 .lang-switcher {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.25rem;
 }
 
 .lang-btn {
@@ -215,6 +226,19 @@ a { text-decoration: none; color: inherit; }
 
 .btn-outline:hover {
   background: rgba(255,255,255,0.15);
+}
+
+.btn-outline-dark {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-outline-dark:hover {
+  background: var(--red-pale);
+  border-color: var(--red);
+  color: var(--red);
+  transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -956,7 +980,7 @@ a { text-decoration: none; color: inherit; }
 .nav-user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .nav-user-avatar {
@@ -1121,6 +1145,53 @@ a { text-decoration: none; color: inherit; }
   transform: none;
 }
 
+/* ===== DONOR WELCOME ===== */
+.donor-welcome-card {
+  text-align: center;
+  background: linear-gradient(135deg, var(--red-pale) 0%, var(--white) 60%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  box-shadow: var(--shadow);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.welcome-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--red);
+  margin-bottom: 1.25rem;
+}
+
+.welcome-greeting {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 800;
+  color: var(--red);
+  margin-bottom: 0.75rem;
+}
+
+.welcome-greeting span {
+  color: var(--red-dark);
+}
+
+.welcome-msg {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto 1.75rem;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1139,7 +1210,9 @@ a { text-decoration: none; color: inherit; }
   .stat-card { padding: 1rem 1.5rem; }
   .section { padding: 3rem 1.5rem; }
   .notif-controls { gap: 0.4rem; }
-  .nav-auth { display: none; }
+  .nav-right { display: none; }
+  .welcome-actions { flex-direction: column; }
+  .welcome-actions .btn { width: 100%; }
 }
 
 @media (max-width: 480px) {
