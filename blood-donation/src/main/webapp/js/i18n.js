@@ -90,6 +90,14 @@ const translations = {
     toast_updated: "✅ Donor profile updated!",
     welcome_msg: "Thank you for joining BloodCare. You're now part of Sri Lanka's blood donation network — ready to help save lives.",
     welcome_view_requests: "View Blood Requests",
+    profile_title: "My Profile",
+    profile_sub: "Your BloodCare donor account",
+    profile_account: "Account",
+    profile_verified: "Email Verified",
+    profile_member: "Member Since",
+    profile_back: "Back to Home",
+    profile_yes: "Yes",
+    profile_no: "No",
   },
 
   si: {
@@ -182,6 +190,14 @@ const translations = {
     toast_updated: "✅ දායක පැතිකඩ යාවත්කාලීන කරන ලදී!",
     welcome_msg: "BloodCare වෙත සම්බන්ධ වූ ඔබට ස්තූතියි. ඔබ දැන් ශ්‍රී ලංකාවේ රුධිර දාන ජාලයේ සාමාජිකයෙකි — ජීවිත බේරා ගැනීමට සූදානම්.",
     welcome_view_requests: "රුධිර ඉල්ලීම් බලන්න",
+    profile_title: "මගේ පැතිකඩ",
+    profile_sub: "ඔබේ BloodCare දායක ගිණුම",
+    profile_account: "ගිණුම",
+    profile_verified: "විද්‍යුත් තැපෑල සත්‍යාපිත",
+    profile_member: "සාමාජික වූ දිනය",
+    profile_back: "මුල් පිටුවට",
+    profile_yes: "ඔව්",
+    profile_no: "නැත",
   },
 
   ta: {
@@ -274,6 +290,14 @@ const translations = {
     toast_updated: "✅ நன்கொடையாளர் சுயவிவரம் புதுப்பிக்கப்பட்டது!",
     welcome_msg: "BloodCare இல் சேர்ந்ததற்கு நன்றி. நீங்கள் இப்போது இலங்கையின் இரத்த தான நெட்வொர்க்கின் ஒரு பகுதியாக உள்ளீர்கள் — உயிர்களை காப்பாற்ற தயாராக உள்ளீர்கள்.",
     welcome_view_requests: "இரத்த கோரிக்கைகளை பார்",
+    profile_title: "என் சுயவிவரம்",
+    profile_sub: "உங்கள் BloodCare நன்கொடையாளர் கணக்கு",
+    profile_account: "கணக்கு",
+    profile_verified: "மின்னஞ்சல் சரிபார்க்கப்பட்டது",
+    profile_member: "உறுப்பினர் ஆன தேதி",
+    profile_back: "முகப்புக்கு திரும்பு",
+    profile_yes: "ஆம்",
+    profile_no: "இல்லை",
   }
 };
 

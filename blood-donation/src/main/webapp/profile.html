@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — BloodCare</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <span class="drop-icon">🩸</span>
+      <span class="brand-text" data-i18n="brand">BloodCare</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#home" data-i18n="nav_home">Home</a></li>
+      <li><a href="index.html#search" data-i18n="nav_search">Find Donor</a></li>
+      <li><a href="index.html#requests" data-i18n="nav_requests">Requests</a></li>
+      <li><a href="index.html#notifications" data-i18n="nav_notifications">Alerts</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-auth">
+        <button id="navSignIn" class="btn btn-nav-auth" onclick="openAuthModal('signin')" data-i18n="auth_signin">Sign In</button>
+        <div id="navUserInfo" class="nav-user-info" style="display:none">
+          <img id="navUserAvatar" class="nav-user-avatar" alt="" />
+          <a href="profile.html" id="navUserName" class="nav-user-name nav-user-link"></a>
+          <button class="btn btn-nav-signout" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
+        </div>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('si')">සිං</button>
+        <button class="lang-btn" onclick="setLang('ta')">தமி</button>
+      </div>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+  </nav>
+
+  <!-- PROFILE -->
+  <section class="section" id="profile">
+    <div class="section-header">
+      <h2 data-i18n="profile_title">My Profile</h2>
+      <p data-i18n="profile_sub">Your BloodCare donor account</p>
+    </div>
+
+    <div class="profile-page-card">
+      <img id="profileAvatar" class="profile-page-avatar" alt="" style="display:none" />
+      <h3 class="profile-page-name" id="profileName">—</h3>
+      <p class="profile-page-email" id="profileEmail">—</p>
+
+      <div class="profile-details">
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_account">Account</span>
+          <span class="profile-detail-value" id="profileProvider">—</span>
+        </div>
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_verified">Email Verified</span>
+          <span class="profile-detail-value" id="profileVerified">—</span>
+        </div>
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_member">Member Since</span>
+          <span class="profile-detail-value" id="profileSince">—</span>
+        </div>
+      </div>
+
+      <div class="profile-page-actions">
+        <a href="index.html" class="btn btn-primary" data-i18n="profile_back">Back to Home</a>
+        <button class="btn btn-outline-dark" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span class="drop-icon">🩸</span>
+        <span data-i18n="brand">BloodCare</span>
+      </div>
+      <p data-i18n="footer_text">Saving lives through technology — Sri Lanka's Blood Donation Network</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
