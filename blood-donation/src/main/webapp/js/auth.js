@@ -61,6 +61,11 @@ function handleRegisterClick(e) {
   }
 }
 
+function toggleMenu() {
+  const links = document.querySelector('.nav-links');
+  if (links) links.classList.toggle('open');
+}
+
 function renderDonorWelcome(user) {
   if (!user) return;
   const fullName = user.displayName || user.email.split('@')[0];
@@ -84,13 +89,15 @@ function updateAuthUI(user) {
   const welcomeSection  = document.getElementById('donorWelcome');
   const navRegister     = document.getElementById('navRegisterItem');
   const heroRegister    = document.getElementById('heroRegisterBtn');
+  const isProfilePage   = location.pathname.endsWith('profile.html');
 
   if (user) {
     if (signInBtn) signInBtn.style.display = 'none';
     if (userInfo) {
       userInfo.style.display = 'flex';
       const name = user.displayName || user.email.split('@')[0];
-      document.getElementById('navUserName').textContent = name.split(' ')[0];
+      const navName = document.getElementById('navUserName');
+      if (navName) navName.textContent = name.split(' ')[0];
       if (user.photoURL) {
         document.getElementById('navUserAvatar').src = user.photoURL;
         document.getElementById('navUserAvatar').style.display = 'block';
@@ -98,11 +105,13 @@ function updateAuthUI(user) {
         document.getElementById('navUserAvatar').style.display = 'none';
       }
     }
-    if (registerSection) registerSection.style.display = 'none';
-    if (welcomeSection) welcomeSection.style.display = '';
-    if (navRegister) navRegister.style.display = 'none';
-    if (heroRegister) heroRegister.style.display = 'none';
-    renderDonorWelcome(user);
+    if (!isProfilePage) {
+      if (registerSection) registerSection.style.display = 'none';
+      if (welcomeSection) welcomeSection.style.display = '';
+      if (navRegister) navRegister.style.display = 'none';
+      if (heroRegister) heroRegister.style.display = 'none';
+      renderDonorWelcome(user);
+    }
   } else {
     if (signInBtn) signInBtn.style.display = 'inline-flex';
     if (userInfo) userInfo.style.display = 'none';
@@ -223,10 +232,23 @@ function handleGoogleRedirectResult() {
     });
 }
 
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+}
+
 async function signOut() {
   try {
     await auth.signOut();
     showToast(t('auth_toast_signout'), 'info');
+    if (location.pathname.endsWith('profile.html')) {
+      setTimeout(() => { location.href = 'index.html'; }, 600);
+    }
   } catch (err) {
     showToast(authErrorMessage(err.code), 'error');
   }
