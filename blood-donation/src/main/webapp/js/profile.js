@@ -1,3 +1,5 @@
+const auth = window.auth;
+
 function renderProfilePage(user) {
   const fullName = user.displayName || user.email.split('@')[0];
   const firstName = fullName.split(' ')[0];

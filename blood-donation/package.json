@@ -1,0 +1,11 @@
+{
+  "name": "bloodcare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/seed-firestore.mjs"
+  },
+  "dependencies": {
+    "firebase": "^11.0.0"
+  }
+}

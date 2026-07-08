@@ -14,5 +14,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+window.auth = firebase.auth();
+window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+window.db = firebase.firestore();
+window.db.settings({ experimentalForceLongPolling: true });

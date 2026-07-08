@@ -1,4 +1,5 @@
 // ===== FIREBASE AUTH =====
+const auth = window.auth;
 let currentUser = null;
 
 const AUTH_ERRORS = {
@@ -248,6 +249,9 @@ async function signOut() {
 
 auth.onAuthStateChanged(user => {
   updateAuthUI(user);
+  if (user && typeof window.upsertDonorProfile === 'function') {
+    window.upsertDonorProfile(user).catch(err => console.error('Donor profile:', err));
+  }
 });
 
 handleGoogleRedirectResult();
@@ -255,3 +259,14 @@ handleGoogleRedirectResult();
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeAuthModal();
 });
+
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.switchAuthTab = switchAuthTab;
+window.signUpWithEmail = signUpWithEmail;
+window.signInWithEmail = signInWithEmail;
+window.signInWithGoogle = signInWithGoogle;
+window.signOut = signOut;
+window.handleRegisterClick = handleRegisterClick;
+window.toggleMenu = toggleMenu;
+window.showToast = showToast;
