@@ -61,19 +61,36 @@ function handleRegisterClick(e) {
   }
 }
 
+function renderDonorWelcome(user) {
+  if (!user) return;
+  const fullName = user.displayName || user.email.split('@')[0];
+  const firstName = fullName.split(' ')[0];
+  const nameEl = document.getElementById('welcomeName');
+  const avatar = document.getElementById('welcomeAvatar');
+  if (nameEl) nameEl.textContent = firstName;
+  if (avatar && user.photoURL) {
+    avatar.src = user.photoURL;
+    avatar.style.display = 'block';
+  } else if (avatar) {
+    avatar.style.display = 'none';
+  }
+}
+
 function updateAuthUI(user) {
   currentUser = user;
-  const signInBtn  = document.getElementById('navSignIn');
-  const userInfo   = document.getElementById('navUserInfo');
-  const authGate   = document.getElementById('authGate');
-  const donorForm  = document.getElementById('donorFormCard');
+  const signInBtn       = document.getElementById('navSignIn');
+  const userInfo        = document.getElementById('navUserInfo');
+  const registerSection = document.getElementById('register');
+  const welcomeSection  = document.getElementById('donorWelcome');
+  const navRegister     = document.getElementById('navRegisterItem');
+  const heroRegister    = document.getElementById('heroRegisterBtn');
 
   if (user) {
     if (signInBtn) signInBtn.style.display = 'none';
     if (userInfo) {
       userInfo.style.display = 'flex';
       const name = user.displayName || user.email.split('@')[0];
-      document.getElementById('navUserName').textContent = name;
+      document.getElementById('navUserName').textContent = name.split(' ')[0];
       if (user.photoURL) {
         document.getElementById('navUserAvatar').src = user.photoURL;
         document.getElementById('navUserAvatar').style.display = 'block';
@@ -81,39 +98,20 @@ function updateAuthUI(user) {
         document.getElementById('navUserAvatar').style.display = 'none';
       }
     }
-    if (authGate) authGate.style.display = 'none';
-    if (donorForm) donorForm.style.display = 'block';
-    prefillDonorForm(user);
+    if (registerSection) registerSection.style.display = 'none';
+    if (welcomeSection) welcomeSection.style.display = '';
+    if (navRegister) navRegister.style.display = 'none';
+    if (heroRegister) heroRegister.style.display = 'none';
+    renderDonorWelcome(user);
   } else {
     if (signInBtn) signInBtn.style.display = 'inline-flex';
     if (userInfo) userInfo.style.display = 'none';
+    if (registerSection) registerSection.style.display = '';
+    if (welcomeSection) welcomeSection.style.display = 'none';
+    if (navRegister) navRegister.style.display = '';
+    if (heroRegister) heroRegister.style.display = '';
+    const authGate = document.getElementById('authGate');
     if (authGate) authGate.style.display = 'flex';
-    if (donorForm) donorForm.style.display = 'none';
-  }
-}
-
-function prefillDonorForm(user) {
-  const nameEl  = document.getElementById('dName');
-  const emailEl = document.getElementById('dEmail');
-  const existing = loadData(DONORS_KEY).find(d => d.uid === user.uid);
-
-  if (emailEl && user.email) {
-    emailEl.value = user.email;
-    emailEl.readOnly = true;
-  }
-
-  if (existing) {
-    if (nameEl) nameEl.value = existing.name || user.displayName || '';
-    const ageEl = document.getElementById('dAge');
-    const bloodEl = document.getElementById('dBlood');
-    const phoneEl = document.getElementById('dPhone');
-    const locEl = document.getElementById('dLocation');
-    if (ageEl && existing.age) ageEl.value = existing.age;
-    if (bloodEl && existing.blood) bloodEl.value = existing.blood;
-    if (phoneEl && existing.phone) phoneEl.value = existing.phone;
-    if (locEl && existing.location) locEl.value = existing.location;
-  } else if (nameEl && user.displayName && !nameEl.value) {
-    nameEl.value = user.displayName;
   }
 }
 
@@ -131,7 +129,7 @@ async function signUpWithEmail(e) {
     await cred.user.sendEmailVerification();
     closeAuthModal();
     showToast(t('auth_toast_verify'), 'info');
-    document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
     showAuthError(authErrorMessage(err.code));
   } finally {
@@ -153,7 +151,7 @@ async function signInWithEmail(e) {
     await auth.signInWithEmailAndPassword(email, password);
     closeAuthModal();
     showToast(t('auth_toast_signin'), 'success');
-    document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
   } catch (err) {
     showAuthError(authErrorMessage(err.code));
   } finally {
@@ -176,7 +174,7 @@ function setGoogleLoading(loading) {
 function onGoogleSignInSuccess() {
   closeAuthModal();
   showToast(t('auth_toast_google'), 'success');
-  document.getElementById('register').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function signInWithGoogle() {
@@ -229,8 +227,6 @@ async function signOut() {
   try {
     await auth.signOut();
     showToast(t('auth_toast_signout'), 'info');
-    const emailEl = document.getElementById('dEmail');
-    if (emailEl) emailEl.readOnly = false;
   } catch (err) {
     showToast(authErrorMessage(err.code), 'error');
   }

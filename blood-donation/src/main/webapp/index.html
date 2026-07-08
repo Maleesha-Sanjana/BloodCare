@@ -16,23 +16,25 @@
     </div>
     <ul class="nav-links">
       <li><a href="#home" data-i18n="nav_home">Home</a></li>
-      <li><a href="#register" onclick="handleRegisterClick(event)" data-i18n="nav_register">Register</a></li>
+      <li id="navRegisterItem"><a href="#register" id="navRegisterLink" onclick="handleRegisterClick(event)" data-i18n="nav_register">Register</a></li>
       <li><a href="#search" data-i18n="nav_search">Find Donor</a></li>
       <li><a href="#requests" data-i18n="nav_requests">Requests</a></li>
       <li><a href="#notifications" data-i18n="nav_notifications">Alerts</a></li>
     </ul>
-    <div class="nav-auth">
-      <button id="navSignIn" class="btn btn-nav-auth" onclick="openAuthModal('signin')" data-i18n="auth_signin">Sign In</button>
-      <div id="navUserInfo" class="nav-user-info" style="display:none">
-        <img id="navUserAvatar" class="nav-user-avatar" alt="" />
-        <span id="navUserName" class="nav-user-name"></span>
-        <button class="btn btn-nav-signout" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
+    <div class="nav-right">
+      <div class="nav-auth">
+        <button id="navSignIn" class="btn btn-nav-auth" onclick="openAuthModal('signin')" data-i18n="auth_signin">Sign In</button>
+        <div id="navUserInfo" class="nav-user-info" style="display:none">
+          <img id="navUserAvatar" class="nav-user-avatar" alt="" />
+          <span id="navUserName" class="nav-user-name"></span>
+          <button class="btn btn-nav-signout" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
+        </div>
       </div>
-    </div>
-    <div class="lang-switcher">
-      <button class="lang-btn active" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('si')">සිං</button>
-      <button class="lang-btn" onclick="setLang('ta')">தமி</button>
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('si')">සිං</button>
+        <button class="lang-btn" onclick="setLang('ta')">தமி</button>
+      </div>
     </div>
     <button class="hamburger" onclick="toggleMenu()">☰</button>
   </nav>
@@ -43,7 +45,7 @@
       <h1 data-i18n="hero_title">Blood Donation<br/><span>Management System</span></h1>
       <p data-i18n="hero_sub">Connecting donors, hospitals, and patients across Sri Lanka</p>
       <div class="hero-btns">
-        <a href="#register" class="btn btn-primary" onclick="handleRegisterClick(event)" data-i18n="hero_btn1">Register as Donor</a>
+        <a href="#register" id="heroRegisterBtn" class="btn btn-primary" onclick="handleRegisterClick(event)" data-i18n="hero_btn1">Register as Donor</a>
         <a href="#search" class="btn btn-outline" data-i18n="hero_btn2">Find Blood</a>
       </div>
     </div>
@@ -96,57 +98,18 @@
         </button>
       </div>
     </div>
-    <div id="donorFormCard" class="form-card" style="display:none">
-      <form id="donorForm" onsubmit="registerDonor(event)">
-        <div class="form-grid">
-          <div class="form-group">
-            <label data-i18n="form_name">Full Name</label>
-            <input type="text" id="dName" placeholder="Enter your full name" required />
-          </div>
-          <div class="form-group">
-            <label data-i18n="form_age">Age</label>
-            <input type="number" id="dAge" min="18" max="65" placeholder="18-65" required />
-          </div>
-          <div class="form-group">
-            <label data-i18n="form_blood">Blood Group</label>
-            <select id="dBlood" required>
-              <option value="">-- Select --</option>
-              <option>A+</option><option>A-</option>
-              <option>B+</option><option>B-</option>
-              <option>AB+</option><option>AB-</option>
-              <option>O+</option><option>O-</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label data-i18n="form_phone">Contact Number</label>
-            <input type="tel" id="dPhone" placeholder="+94 XX XXX XXXX" required />
-          </div>
-          <div class="form-group">
-            <label data-i18n="form_location">District / Location</label>
-            <select id="dLocation" required>
-              <option value="">-- Select District --</option>
-              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
-              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
-              <option>Galle</option><option>Matara</option><option>Hambantota</option>
-              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
-              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
-              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
-              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
-              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
-              <option>Kegalle</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label data-i18n="form_email">Email</label>
-            <input type="email" id="dEmail" placeholder="your@email.com" required readonly />
-          </div>
-        </div>
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="dConsent" required />
-          <label for="dConsent" data-i18n="form_consent">I consent to be contacted for blood donation requests</label>
-        </div>
-        <button type="submit" class="btn btn-primary full-width" data-i18n="form_submit">Register as Donor</button>
-      </form>
+  </section>
+
+  <!-- DONOR WELCOME (logged-in) -->
+  <section class="section" id="donorWelcome" style="display:none">
+    <div class="donor-welcome-card">
+      <img id="welcomeAvatar" class="welcome-avatar" alt="" style="display:none" />
+      <h2 class="welcome-greeting">Hi <span id="welcomeName"></span>! 👋</h2>
+      <p class="welcome-msg" data-i18n="welcome_msg">Thank you for joining BloodCare. You're now part of Sri Lanka's blood donation network — ready to help save lives.</p>
+      <div class="welcome-actions">
+        <a href="#search" class="btn btn-primary" data-i18n="hero_btn2">Find Blood</a>
+        <a href="#requests" class="btn btn-outline-dark" data-i18n="welcome_view_requests">View Blood Requests</a>
+      </div>
     </div>
   </section>
 

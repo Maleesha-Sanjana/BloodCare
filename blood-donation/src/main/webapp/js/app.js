@@ -69,54 +69,6 @@ function updateStats() {
   animateCounter('stat-saved',    Math.floor(donors * 2.3));
 }
 
-// ===== DONOR REGISTRATION =====
-function registerDonor(e) {
-  e.preventDefault();
-
-  const user = auth.currentUser;
-  if (!user) {
-    openAuthModal('signup');
-    return;
-  }
-
-  const donor = {
-    id:       Date.now(),
-    uid:      user.uid,
-    name:     document.getElementById('dName').value.trim(),
-    age:      parseInt(document.getElementById('dAge').value),
-    blood:    document.getElementById('dBlood').value,
-    phone:    document.getElementById('dPhone').value.trim(),
-    location: document.getElementById('dLocation').value,
-    email:    user.email,
-    date:     new Date().toISOString().split('T')[0],
-  };
-
-  const donors = loadData(DONORS_KEY);
-  const existing = donors.findIndex(d => d.uid === user.uid);
-  if (existing >= 0) {
-    donors[existing] = { ...donors[existing], ...donor, id: donors[existing].id };
-    saveData(DONORS_KEY, donors);
-    showToast(t('toast_updated'), 'success');
-  } else {
-    donors.push(donor);
-    saveData(DONORS_KEY, donors);
-    addNotification({
-      type: 'hospital',
-      icon: '✅',
-      title: 'New Donor Registered',
-      msg: `${donor.name} (${donor.blood}) from ${donor.location} has joined the network.`,
-      time: 'Just now',
-      read: false,
-    });
-    showToast(t('toast_registered'), 'success');
-  }
-
-  document.getElementById('donorForm').reset();
-  prefillDonorForm(user);
-  updateStats();
-  renderNotifications();
-}
-
 // ===== DONOR SEARCH =====
 function searchDonors() {
   const blood    = document.getElementById('sBlood').value;
@@ -332,7 +284,10 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 
 // ===== ACTIVE NAV HIGHLIGHT =====
 function highlightNav() {
-  const sections = ['home','register','search','requests','notifications'];
+  const loggedIn = typeof auth !== 'undefined' && auth.currentUser;
+  const sections = loggedIn
+    ? ['home', 'donorWelcome', 'search', 'requests', 'notifications']
+    : ['home', 'register', 'search', 'requests', 'notifications'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
