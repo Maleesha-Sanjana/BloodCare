@@ -83,13 +83,11 @@ function renderDonorWelcome(user) {
 
 function updateAuthUI(user) {
   currentUser = user;
-  const signInBtn       = document.getElementById('navSignIn');
-  const userInfo        = document.getElementById('navUserInfo');
-  const registerSection = document.getElementById('register');
-  const welcomeSection  = document.getElementById('donorWelcome');
-  const navRegister     = document.getElementById('navRegisterItem');
-  const heroRegister    = document.getElementById('heroRegisterBtn');
-  const isProfilePage   = location.pathname.endsWith('profile.html');
+  const signInBtn      = document.getElementById('navSignIn');
+  const userInfo       = document.getElementById('navUserInfo');
+  const welcomeSection = document.getElementById('donorWelcome');
+  const heroRegister   = document.getElementById('heroRegisterBtn');
+  const isProfilePage  = location.pathname.endsWith('profile.html');
 
   if (user) {
     if (signInBtn) signInBtn.style.display = 'none';
@@ -106,21 +104,15 @@ function updateAuthUI(user) {
       }
     }
     if (!isProfilePage) {
-      if (registerSection) registerSection.style.display = 'none';
       if (welcomeSection) welcomeSection.style.display = '';
-      if (navRegister) navRegister.style.display = 'none';
       if (heroRegister) heroRegister.style.display = 'none';
       renderDonorWelcome(user);
     }
   } else {
     if (signInBtn) signInBtn.style.display = 'inline-flex';
     if (userInfo) userInfo.style.display = 'none';
-    if (registerSection) registerSection.style.display = '';
     if (welcomeSection) welcomeSection.style.display = 'none';
-    if (navRegister) navRegister.style.display = '';
     if (heroRegister) heroRegister.style.display = '';
-    const authGate = document.getElementById('authGate');
-    if (authGate) authGate.style.display = 'flex';
   }
 }
 

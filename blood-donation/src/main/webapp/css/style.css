@@ -1202,6 +1202,94 @@ a.nav-user-link:hover {
   justify-content: center;
 }
 
+/* ===== LEADERBOARD ===== */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.leaderboard-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.leaderboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+}
+
+.leaderboard-card.lb-top-1 {
+  border-color: #f1c40f;
+  background: linear-gradient(135deg, #fffdf0 0%, var(--white) 100%);
+}
+
+.leaderboard-card.lb-top-2 {
+  border-color: #bdc3c7;
+  background: linear-gradient(135deg, #f8f9fa 0%, var(--white) 100%);
+}
+
+.leaderboard-card.lb-top-3 {
+  border-color: #cd7f32;
+  background: linear-gradient(135deg, #fdf6f0 0%, var(--white) 100%);
+}
+
+.lb-rank, .lb-rank-top {
+  font-size: 1.5rem;
+  font-weight: 800;
+  min-width: 48px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.lb-rank {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.lb-info { flex: 1; min-width: 0; }
+
+.lb-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.lb-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.lb-donations {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.lb-donations-num {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--red);
+  line-height: 1;
+}
+
+.lb-donations-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 /* ===== PROFILE PAGE ===== */
 .profile-page-card {
   text-align: center;
