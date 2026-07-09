@@ -320,8 +320,8 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 function highlightNav() {
   const loggedIn = window.auth && window.auth.currentUser;
   const sections = loggedIn
-    ? ['home', 'quickSearch', 'donorWelcome', 'requestMapSection', 'search', 'requests']
-    : ['home', 'quickSearch', 'requestMapSection', 'search', 'requests'];
+    ? ['home', 'quickSearch', 'donorWelcome', 'requestMapSection', 'search', 'requests', 'leaderboard']
+    : ['home', 'quickSearch', 'requestMapSection', 'search', 'requests', 'leaderboard'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
@@ -372,6 +372,7 @@ window.bootApp = function () {
   if (document.getElementById('searchResults')) searchDonors();
   if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
   if (typeof window.initRequestMap === 'function') window.initRequestMap();
+  if (typeof window.initLeaderboard === 'function') window.initLeaderboard();
 };
 
 Object.assign(window, {
