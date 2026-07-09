@@ -132,6 +132,7 @@
     if ($('rLevelValue')) $('rLevelValue').textContent = '-- Select --';
     if ($('rLevelWrap')) $('rLevelWrap').classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
     if ($('rLevelDropdown')) setCheckmarks($('rLevelDropdown'), null);
+    if (typeof window.clearRequestLocation === 'function') window.clearRequestLocation();
   }
 
   function init() {

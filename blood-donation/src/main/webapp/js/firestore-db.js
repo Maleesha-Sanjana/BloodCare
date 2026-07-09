@@ -23,9 +23,9 @@ const SAMPLE_DONORS = [
 ];
 
 const SAMPLE_REQUESTS = [
-  { hospital: 'Colombo National Hospital', blood: 'O+', location: 'Colombo', contact: '+94 11 269 1111', level: 'critical', units: 3, date: '2026-04-29', time: '08:30' },
-  { hospital: 'Kandy Teaching Hospital',   blood: 'A+', location: 'Kandy',   contact: '+94 81 222 2222', level: 'urgent',   units: 2, date: '2026-04-29', time: '10:15' },
-  { hospital: 'Karapitiya Hospital',       blood: 'B-', location: 'Galle',   contact: '+94 91 222 3333', level: 'normal',   units: 1, date: '2026-04-28', time: '14:00' },
+  { hospital: 'Colombo National Hospital', blood: 'O+', location: 'Colombo', contact: '+94 11 269 1111', level: 'critical', units: 3, date: '2026-04-29', time: '08:30', lat: 6.9147, lng: 79.8613 },
+  { hospital: 'Kandy Teaching Hospital',   blood: 'A+', location: 'Kandy',   contact: '+94 81 222 2222', level: 'urgent',   units: 2, date: '2026-04-29', time: '10:15', lat: 7.2914, lng: 80.6368 },
+  { hospital: 'Karapitiya Hospital',       blood: 'B-', location: 'Galle',   contact: '+94 91 222 3333', level: 'normal',   units: 1, date: '2026-04-28', time: '14:00', lat: 6.0580, lng: 80.2175 },
 ];
 
 const SAMPLE_NOTIFICATIONS = [
