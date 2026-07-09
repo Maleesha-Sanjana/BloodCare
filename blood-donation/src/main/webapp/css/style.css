@@ -1151,6 +1151,45 @@ body.notif-open {
 .modal-box p  { margin-bottom: 0.5rem; font-size: 0.95rem; }
 .modal-box .modal-label { font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
 
+.success-modal-body {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.success-modal-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.success-modal-title {
+  color: var(--red);
+  font-size: 1.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.success-modal-msg {
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.success-details {
+  background: var(--red-pale);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.success-detail-row {
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+.success-modal-btn {
+  margin-top: 0.5rem;
+}
+
 /* ===== AUTH ===== */
 .nav-auth {
   display: flex;
@@ -1667,6 +1706,63 @@ a.nav-user-link:hover {
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+.gps-form-group .fetch-loc-btn {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.gps-coords-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.gps-coord-field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.gps-coord-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  background: #f8f9fa;
+  color: var(--text);
+  cursor: default;
+}
+
+.gps-coord-input.has-value {
+  border-color: #27ae60;
+  background: #f0faf4;
+  color: #1e8449;
+  font-weight: 600;
+}
+
+.gps-coord-input.loading {
+  border-color: #2980b9;
+  background: #ebf5fb;
+  color: #2980b9;
+  font-style: italic;
+}
+
+.gps-coord-input.error {
+  border-color: var(--red);
+  background: var(--red-pale);
+  color: var(--red);
+  font-size: 0.78rem;
 }
 
 .fetch-loc-btn {
