@@ -68,11 +68,32 @@ function clearRequestLocation() {
   const lat = document.getElementById('rLat');
   const lng = document.getElementById('rLng');
   const status = document.getElementById('locationStatus');
-  if (lat) lat.value = '';
-  if (lng) lng.value = '';
+  if (lat) { lat.value = ''; lat.classList.remove('has-value', 'loading', 'error'); }
+  if (lng) { lng.value = ''; lng.classList.remove('has-value', 'loading', 'error'); }
   if (status) {
     status.textContent = '';
     status.className = 'location-status';
+  }
+}
+
+function setCoordFields(lat, lng, state) {
+  const latEl = document.getElementById('rLat');
+  const lngEl = document.getElementById('rLng');
+  const cls = state === 'loading' ? 'loading' : state === 'error' ? 'error' : state === 'success' ? 'has-value' : '';
+  [latEl, lngEl].forEach(el => {
+    if (!el) return;
+    el.classList.remove('has-value', 'loading', 'error');
+    if (cls) el.classList.add(cls);
+  });
+  if (state === 'loading') {
+    const msg = t('req_gps_fetching');
+    if (latEl) latEl.value = msg;
+    if (lngEl) lngEl.value = msg;
+    return;
+  }
+  if (lat != null && lng != null) {
+    if (latEl) latEl.value = Number(lat).toFixed(6);
+    if (lngEl) lngEl.value = Number(lng).toFixed(6);
   }
 }
 
@@ -80,59 +101,130 @@ function fetchRequestLocation() {
   const btn = document.getElementById('fetchLocationBtn');
   const status = document.getElementById('locationStatus');
 
+  function setStatus(text, cls) {
+    if (!status) return;
+    status.textContent = text;
+    status.className = 'location-status' + (cls ? ' ' + cls : '');
+  }
+
+  function applyCoords(lat, lng, label) {
+    setCoordFields(lat, lng, 'success');
+    setStatus(label || `✓ ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}`, 'success');
+    if (btn) btn.disabled = false;
+    showToast(t('req_gps_success'), 'success');
+  }
+
+  function useDistrictFallback() {
+    const district = document.getElementById('rLocation')?.value;
+    const coords = district && window.DISTRICT_COORDS?.[district];
+    if (!coords) return false;
+    applyCoords(coords[0], coords[1], `✓ ${district} — ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`);
+    showToast(t('req_gps_district_used').replace('{district}', district), 'info');
+    return true;
+  }
+
+  function geoErrorMessage(err) {
+    const codes = {
+      1: t('req_gps_denied'),
+      2: t('req_gps_unavailable'),
+      3: t('req_gps_timeout'),
+    };
+    return codes[err?.code] || t('req_gps_failed');
+  }
+
+  function onGeoError(err) {
+    console.error('Geolocation:', err);
+    if (useDistrictFallback()) return;
+    setCoordFields(null, null, 'error');
+    const latEl = document.getElementById('rLat');
+    const lngEl = document.getElementById('rLng');
+    const errMsg = t('req_gps_failed');
+    if (latEl) latEl.value = errMsg;
+    if (lngEl) lngEl.value = errMsg;
+    setStatus(geoErrorMessage(err), 'error');
+    if (btn) btn.disabled = false;
+    showToast(geoErrorMessage(err), 'error');
+  }
+
   if (!navigator.geolocation) {
-    showToast('Geolocation is not supported on this browser.', 'error');
+    if (!useDistrictFallback()) showToast(t('req_gps_unsupported'), 'error');
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    if (!useDistrictFallback()) showToast(t('req_gps_secure'), 'error');
     return;
   }
 
   if (btn) btn.disabled = true;
-  if (status) {
-    status.textContent = t('req_gps_fetching');
-    status.className = 'location-status loading';
-  }
+  setCoordFields(null, null, 'loading');
+  setStatus(t('req_gps_fetching'), 'loading');
+
+  const tryLowAccuracy = () => {
+    navigator.geolocation.getCurrentPosition(
+      pos => applyCoords(pos.coords.latitude, pos.coords.longitude),
+      err => onGeoError(err),
+      { enableHighAccuracy: false, timeout: 30000, maximumAge: 120000 }
+    );
+  };
 
   navigator.geolocation.getCurrentPosition(
-    pos => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      document.getElementById('rLat').value = lat;
-      document.getElementById('rLng').value = lng;
-      if (status) {
-        status.textContent = `✓ ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-        status.className = 'location-status success';
-      }
-      if (btn) btn.disabled = false;
-      showToast(t('req_gps_success'), 'success');
-    },
-    err => {
-      console.error('Geolocation:', err);
-      if (status) {
-        status.textContent = t('req_gps_failed');
-        status.className = 'location-status error';
-      }
-      if (btn) btn.disabled = false;
-      showToast(t('req_gps_denied'), 'error');
-    },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    pos => applyCoords(pos.coords.latitude, pos.coords.longitude),
+    () => tryLowAccuracy(),
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
   );
+}
+
+function showSuccessModal(title, message, detailsHtml) {
+  const content = document.getElementById('modalContent');
+  if (!content) {
+    showToast(message, 'success');
+    return;
+  }
+  content.innerHTML = `
+    <div class="success-modal-body">
+      <div class="success-modal-icon">✅</div>
+      <h3 class="success-modal-title">${escHtml(title)}</h3>
+      <p class="success-modal-msg">${escHtml(message)}</p>
+      ${detailsHtml || ''}
+      <button type="button" class="btn btn-primary full-width success-modal-btn" onclick="closeModal()">${t('success_ok')}</button>
+    </div>`;
+  openModal();
+  showToast(message, 'success');
 }
 
 async function postRequest(e) {
   e.preventDefault();
+
+  const hospital = document.getElementById('rHospital').value.trim();
+  const blood    = document.getElementById('rBlood').value;
+  const location = document.getElementById('rLocation').value;
+  const contact  = document.getElementById('rContact').value.trim();
+  const level    = document.getElementById('rLevel').value;
+  const units    = parseInt(document.getElementById('rUnits').value, 10);
+
+  if (!hospital || !blood || !location || !contact || !level || !units) {
+    showToast(t('req_form_incomplete'), 'error');
+    return;
+  }
+
+  const submitBtn = document.querySelector('#requestForm button[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
   const req = {
-    hospital: document.getElementById('rHospital').value.trim(),
-    blood:    document.getElementById('rBlood').value,
-    location: document.getElementById('rLocation').value,
-    contact:  document.getElementById('rContact').value.trim(),
-    level:    document.getElementById('rLevel').value,
-    units:    parseInt(document.getElementById('rUnits').value),
-    date:     new Date().toISOString().split('T')[0],
-    time:     new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
+    hospital,
+    blood,
+    location,
+    contact,
+    level,
+    units,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
   };
 
   const lat = parseFloat(document.getElementById('rLat').value);
   const lng = parseFloat(document.getElementById('rLng').value);
-  if (!isNaN(lat) && !isNaN(lng)) {
+  if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
     req.lat = lat;
     req.lng = lng;
   }
@@ -140,23 +232,45 @@ async function postRequest(e) {
   try {
     await window.addRequest(req);
 
-    const levelLabel = { critical: '🚨 CRITICAL', urgent: '⚠️ URGENT', normal: '📋 Normal' }[req.level];
-    await window.addNotification({
-      type: req.level === 'critical' ? 'emergency' : 'hospital',
-      icon: req.level === 'critical' ? '🚨' : '🏥',
-      title: `${levelLabel}: ${req.blood} Blood Needed`,
-      msg: `${req.hospital} in ${req.location} needs ${req.units} unit(s) of ${req.blood} blood.`,
-      time: 'Just now',
-      read: false,
-    });
+    try {
+      const levelLabel = { critical: '🚨 CRITICAL', urgent: '⚠️ URGENT', normal: '📋 Normal' }[req.level];
+      await window.addNotification({
+        type: req.level === 'critical' ? 'emergency' : 'hospital',
+        icon: req.level === 'critical' ? '🚨' : '🏥',
+        title: `${levelLabel}: ${req.blood} Blood Needed`,
+        msg: `${req.hospital} in ${req.location} needs ${req.units} unit(s) of ${req.blood} blood.`,
+        time: 'Just now',
+        read: false,
+      });
+    } catch (nErr) {
+      console.warn('Notification skipped:', nErr);
+    }
 
     document.getElementById('requestForm').reset();
     window.resetReqDropdowns();
     clearRequestLocation();
-    showToast(t('toast_request'), 'success');
+
+    const gpsNote = req.lat != null
+      ? `<p class="success-detail-row">📌 ${t('success_gps_pinned')}</p>`
+      : '';
+
+    showSuccessModal(
+      t('success_request_title'),
+      t('toast_request'),
+      `<div class="success-details">
+        <p class="success-detail-row"><strong>${escHtml(req.hospital)}</strong></p>
+        <p class="success-detail-row">🩸 ${escHtml(req.blood)} &nbsp;|&nbsp; ${req.units} ${t('req_units').toLowerCase()}</p>
+        <p class="success-detail-row">📍 ${escHtml(req.location)} &nbsp;|&nbsp; <span class="req-badge ${req.level}">${req.level.toUpperCase()}</span></p>
+        ${gpsNote}
+      </div>`
+    );
+
+    if (typeof window.renderRequestMap === 'function') window.renderRequestMap();
   } catch (err) {
     console.error('postRequest:', err);
-    showToast('Failed to post request. Please try again.', 'error');
+    showToast(t('req_post_failed'), 'error');
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
@@ -205,8 +319,11 @@ function showToast(msg, type = 'success') {
   toast.textContent = msg;
   toast.className = `toast ${type} show`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 4500);
 }
+
+// Canonical toast for all scripts
+window.showToast = showToast;
 
 // ===== MODAL =====
 function openModal()  { document.getElementById('modal').classList.add('open'); }
@@ -275,6 +392,7 @@ function startAppListeners() {
 
 window.bootApp = function () {
   startAppListeners();
+  initRequestForm();
   if (document.getElementById('requestsList')) renderRequests();
   if (document.getElementById('searchResults')) searchDonors();
   if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
@@ -283,6 +401,23 @@ window.bootApp = function () {
 
 Object.assign(window, {
   quickSearch, searchDonors, postRequest, fetchRequestLocation, clearRequestLocation,
-  showDonorContact, respondToRequest, showToast, openModal, closeModal, toggleMenu,
+  showDonorContact, respondToRequest, showSuccessModal, openModal, closeModal, toggleMenu,
   renderRequests,
 });
+
+function initRequestForm() {
+  const gpsBtn = document.getElementById('fetchLocationBtn');
+  if (gpsBtn && !gpsBtn.dataset.bound) {
+    gpsBtn.dataset.bound = '1';
+    gpsBtn.addEventListener('click', e => {
+      e.preventDefault();
+      fetchRequestLocation();
+    });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRequestForm);
+} else {
+  initRequestForm();
+}

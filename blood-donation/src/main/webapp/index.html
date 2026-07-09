@@ -322,17 +322,23 @@
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group gps-form-group">
             <label data-i18n="req_gps_label">GPS Location</label>
-            <div class="fetch-location-row">
-              <button type="button" class="btn btn-outline fetch-loc-btn" id="fetchLocationBtn" onclick="fetchRequestLocation()">
-                📍 <span data-i18n="req_fetch_location">Fetch Location</span>
-              </button>
-              <span id="locationStatus" class="location-status"></span>
+            <button type="button" class="btn btn-primary fetch-loc-btn" id="fetchLocationBtn" onclick="fetchRequestLocation()">
+              📍 <span data-i18n="req_fetch_location">Fetch My Location</span>
+            </button>
+            <div class="gps-coords-row">
+              <div class="gps-coord-field">
+                <label data-i18n="req_lat">Latitude</label>
+                <input type="text" id="rLat" readonly class="gps-coord-input" placeholder="—" />
+              </div>
+              <div class="gps-coord-field">
+                <label data-i18n="req_lng">Longitude</label>
+                <input type="text" id="rLng" readonly class="gps-coord-input" placeholder="—" />
+              </div>
             </div>
-            <input type="hidden" id="rLat" />
-            <input type="hidden" id="rLng" />
-            <p class="form-hint" data-i18n="req_gps_hint">Allow location access to pin the exact hospital on the map.</p>
+            <p id="locationStatus" class="location-status"></p>
+            <p class="form-hint" data-i18n="req_gps_hint">Click the button above and allow location access. Your coordinates will appear here.</p>
           </div>
 
           <div class="form-group">
@@ -490,14 +496,14 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/i18n.js?v=13"></script>
-  <script src="js/dropdowns.js?v=13"></script>
-  <script src="js/firebase-config.js?v=13"></script>
-  <script src="js/firestore-db.js?v=13"></script>
-  <script src="js/location-utils.js?v=13"></script>
-  <script src="js/notifications.js?v=13"></script>
-  <script src="js/auth.js?v=13"></script>
-  <script src="js/app.js?v=13"></script>
-  <script src="js/map.js?v=13"></script>
+  <script src="js/i18n.js?v=15"></script>
+  <script src="js/dropdowns.js?v=15"></script>
+  <script src="js/firebase-config.js?v=15"></script>
+  <script src="js/firestore-db.js?v=15"></script>
+  <script src="js/location-utils.js?v=15"></script>
+  <script src="js/notifications.js?v=15"></script>
+  <script src="js/auth.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
+  <script src="js/map.js?v=15"></script>
 </body>
 </html>

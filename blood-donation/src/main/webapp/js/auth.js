@@ -227,12 +227,16 @@ function handleGoogleRedirectResult() {
 
 let toastTimer;
 function showToast(msg, type = 'success') {
+  if (typeof window.showToast === 'function' && window.showToast !== showToast) {
+    window.showToast(msg, type);
+    return;
+  }
   const toast = document.getElementById('toast');
   if (!toast) return;
   toast.textContent = msg;
   toast.className = `toast ${type} show`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 4500);
 }
 
 async function signOut() {
@@ -277,4 +281,3 @@ window.signInWithGoogle = signInWithGoogle;
 window.signOut = signOut;
 window.handleRegisterClick = handleRegisterClick;
 window.toggleMenu = toggleMenu;
-window.showToast = showToast;
