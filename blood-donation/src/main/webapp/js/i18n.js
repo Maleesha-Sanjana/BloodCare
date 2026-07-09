@@ -42,7 +42,7 @@ const translations = {
     level_critical: "🔴 Critical",
     level_urgent: "🟠 Urgent",
     level_normal: "🟢 Normal",
-    notif_title: "Notification Center",
+    notif_title: "Notifications",
     notif_sub: "Stay updated with blood donation alerts",
     notif_all: "All",
     notif_emergency: "Emergency",

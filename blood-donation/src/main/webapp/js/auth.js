@@ -252,6 +252,14 @@ auth.onAuthStateChanged(user => {
   if (user && typeof window.upsertDonorProfile === 'function') {
     window.upsertDonorProfile(user).catch(err => console.error('Donor profile:', err));
   }
+  if (typeof window.reloadNotifications === 'function') {
+    window.reloadNotifications()
+      .then(() => {
+        if (typeof window.renderNotifications === 'function') window.renderNotifications();
+        if (typeof window.updateNotifBadge === 'function') window.updateNotifBadge();
+      })
+      .catch(err => console.error('Notifications refresh:', err));
+  }
 });
 
 handleGoogleRedirectResult();
