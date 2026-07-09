@@ -64,116 +64,7 @@ function showDonorContact(id) {
 }
 
 // ===== DONATION REQUESTS =====
-function clearRequestLocation() {
-  const lat = document.getElementById('rLat');
-  const lng = document.getElementById('rLng');
-  const status = document.getElementById('locationStatus');
-  if (lat) { lat.value = ''; lat.classList.remove('has-value', 'loading', 'error'); }
-  if (lng) { lng.value = ''; lng.classList.remove('has-value', 'loading', 'error'); }
-  if (status) {
-    status.textContent = '';
-    status.className = 'location-status';
-  }
-}
-
-function setCoordFields(lat, lng, state) {
-  const latEl = document.getElementById('rLat');
-  const lngEl = document.getElementById('rLng');
-  const cls = state === 'loading' ? 'loading' : state === 'error' ? 'error' : state === 'success' ? 'has-value' : '';
-  [latEl, lngEl].forEach(el => {
-    if (!el) return;
-    el.classList.remove('has-value', 'loading', 'error');
-    if (cls) el.classList.add(cls);
-  });
-  if (state === 'loading') {
-    const msg = t('req_gps_fetching');
-    if (latEl) latEl.value = msg;
-    if (lngEl) lngEl.value = msg;
-    return;
-  }
-  if (lat != null && lng != null) {
-    if (latEl) latEl.value = Number(lat).toFixed(6);
-    if (lngEl) lngEl.value = Number(lng).toFixed(6);
-  }
-}
-
-function fetchRequestLocation() {
-  const btn = document.getElementById('fetchLocationBtn');
-  const status = document.getElementById('locationStatus');
-
-  function setStatus(text, cls) {
-    if (!status) return;
-    status.textContent = text;
-    status.className = 'location-status' + (cls ? ' ' + cls : '');
-  }
-
-  function applyCoords(lat, lng, label) {
-    setCoordFields(lat, lng, 'success');
-    setStatus(label || `✓ ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}`, 'success');
-    if (btn) btn.disabled = false;
-    showToast(t('req_gps_success'), 'success');
-  }
-
-  function useDistrictFallback() {
-    const district = document.getElementById('rLocation')?.value;
-    const coords = district && window.DISTRICT_COORDS?.[district];
-    if (!coords) return false;
-    applyCoords(coords[0], coords[1], `✓ ${district} — ${coords[0].toFixed(6)}, ${coords[1].toFixed(6)}`);
-    showToast(t('req_gps_district_used').replace('{district}', district), 'info');
-    return true;
-  }
-
-  function geoErrorMessage(err) {
-    const codes = {
-      1: t('req_gps_denied'),
-      2: t('req_gps_unavailable'),
-      3: t('req_gps_timeout'),
-    };
-    return codes[err?.code] || t('req_gps_failed');
-  }
-
-  function onGeoError(err) {
-    console.error('Geolocation:', err);
-    if (useDistrictFallback()) return;
-    setCoordFields(null, null, 'error');
-    const latEl = document.getElementById('rLat');
-    const lngEl = document.getElementById('rLng');
-    const errMsg = t('req_gps_failed');
-    if (latEl) latEl.value = errMsg;
-    if (lngEl) lngEl.value = errMsg;
-    setStatus(geoErrorMessage(err), 'error');
-    if (btn) btn.disabled = false;
-    showToast(geoErrorMessage(err), 'error');
-  }
-
-  if (!navigator.geolocation) {
-    if (!useDistrictFallback()) showToast(t('req_gps_unsupported'), 'error');
-    return;
-  }
-
-  if (!window.isSecureContext) {
-    if (!useDistrictFallback()) showToast(t('req_gps_secure'), 'error');
-    return;
-  }
-
-  if (btn) btn.disabled = true;
-  setCoordFields(null, null, 'loading');
-  setStatus(t('req_gps_fetching'), 'loading');
-
-  const tryLowAccuracy = () => {
-    navigator.geolocation.getCurrentPosition(
-      pos => applyCoords(pos.coords.latitude, pos.coords.longitude),
-      err => onGeoError(err),
-      { enableHighAccuracy: false, timeout: 30000, maximumAge: 120000 }
-    );
-  };
-
-  navigator.geolocation.getCurrentPosition(
-    pos => applyCoords(pos.coords.latitude, pos.coords.longitude),
-    () => tryLowAccuracy(),
-    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-  );
-}
+// GPS handled in gps.js (fetchRequestLocation, clearRequestLocation)
 
 function showSuccessModal(title, message, detailsHtml) {
   const content = document.getElementById('modalContent');
@@ -248,7 +139,7 @@ async function postRequest(e) {
 
     document.getElementById('requestForm').reset();
     window.resetReqDropdowns();
-    clearRequestLocation();
+    if (typeof window.clearRequestLocation === 'function') window.clearRequestLocation();
 
     const gpsNote = req.lat != null
       ? `<p class="success-detail-row">📌 ${t('success_gps_pinned')}</p>`
@@ -392,7 +283,7 @@ function startAppListeners() {
 
 window.bootApp = function () {
   startAppListeners();
-  initRequestForm();
+  if (typeof window.initGpsButton === 'function') window.initGpsButton();
   if (document.getElementById('requestsList')) renderRequests();
   if (document.getElementById('searchResults')) searchDonors();
   if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
@@ -400,24 +291,7 @@ window.bootApp = function () {
 };
 
 Object.assign(window, {
-  quickSearch, searchDonors, postRequest, fetchRequestLocation, clearRequestLocation,
+  quickSearch, searchDonors, postRequest,
   showDonorContact, respondToRequest, showSuccessModal, openModal, closeModal, toggleMenu,
   renderRequests,
 });
-
-function initRequestForm() {
-  const gpsBtn = document.getElementById('fetchLocationBtn');
-  if (gpsBtn && !gpsBtn.dataset.bound) {
-    gpsBtn.dataset.bound = '1';
-    gpsBtn.addEventListener('click', e => {
-      e.preventDefault();
-      fetchRequestLocation();
-    });
-  }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initRequestForm);
-} else {
-  initRequestForm();
-}

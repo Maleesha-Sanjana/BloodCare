@@ -126,6 +126,7 @@
     if ($('rBloodValue')) $('rBloodValue').textContent = '-- Select --';
     if ($('rBloodWrap')) $('rBloodWrap').classList.remove('has-value');
     if ($('rBloodDropdown')) setCheckmarks($('rBloodDropdown'), null);
+    if ($('rLocation')) $('rLocation').value = '';
     if ($('rLocationValue')) $('rLocationValue').textContent = '-- Select District --';
     if ($('rLocationWrap')) $('rLocationWrap').classList.remove('has-value');
     if ($('rLocationOptionsList')) setCheckmarks($('rLocationOptionsList'), null);
