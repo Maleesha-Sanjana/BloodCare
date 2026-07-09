@@ -64,6 +64,59 @@ function showDonorContact(id) {
 }
 
 // ===== DONATION REQUESTS =====
+function clearRequestLocation() {
+  const lat = document.getElementById('rLat');
+  const lng = document.getElementById('rLng');
+  const status = document.getElementById('locationStatus');
+  if (lat) lat.value = '';
+  if (lng) lng.value = '';
+  if (status) {
+    status.textContent = '';
+    status.className = 'location-status';
+  }
+}
+
+function fetchRequestLocation() {
+  const btn = document.getElementById('fetchLocationBtn');
+  const status = document.getElementById('locationStatus');
+
+  if (!navigator.geolocation) {
+    showToast('Geolocation is not supported on this browser.', 'error');
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  if (status) {
+    status.textContent = t('req_gps_fetching');
+    status.className = 'location-status loading';
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      document.getElementById('rLat').value = lat;
+      document.getElementById('rLng').value = lng;
+      if (status) {
+        status.textContent = `✓ ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        status.className = 'location-status success';
+      }
+      if (btn) btn.disabled = false;
+      showToast(t('req_gps_success'), 'success');
+    },
+    err => {
+      console.error('Geolocation:', err);
+      if (status) {
+        status.textContent = t('req_gps_failed');
+        status.className = 'location-status error';
+      }
+      if (btn) btn.disabled = false;
+      showToast(t('req_gps_denied'), 'error');
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+  );
+}
+
 async function postRequest(e) {
   e.preventDefault();
   const req = {
@@ -76,6 +129,13 @@ async function postRequest(e) {
     date:     new Date().toISOString().split('T')[0],
     time:     new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
   };
+
+  const lat = parseFloat(document.getElementById('rLat').value);
+  const lng = parseFloat(document.getElementById('rLng').value);
+  if (!isNaN(lat) && !isNaN(lng)) {
+    req.lat = lat;
+    req.lng = lng;
+  }
 
   try {
     await window.addRequest(req);
@@ -92,6 +152,7 @@ async function postRequest(e) {
 
     document.getElementById('requestForm').reset();
     window.resetReqDropdowns();
+    clearRequestLocation();
     showToast(t('toast_request'), 'success');
   } catch (err) {
     console.error('postRequest:', err);
@@ -114,7 +175,7 @@ function renderRequests() {
         <span class="req-badge ${r.level}">${r.level.toUpperCase()}</span>
       </div>
       <div class="req-hospital">${escHtml(r.hospital)}</div>
-      <div class="req-details">📍 ${escHtml(r.location)} &nbsp;|&nbsp; 🩸 ${r.units} unit(s) &nbsp;|&nbsp; 📅 ${r.date} ${r.time}</div>
+      <div class="req-details">📍 ${escHtml(r.location)}${r.lat != null ? ' 📌' : ''} &nbsp;|&nbsp; 🩸 ${r.units} unit(s) &nbsp;|&nbsp; 📅 ${r.date} ${r.time}</div>
       <button class="req-respond-btn" onclick="respondToRequest('${r.id}')">${t('respond_request')}</button>
     </div>
   `).join('');
@@ -168,8 +229,8 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 function highlightNav() {
   const loggedIn = window.auth && window.auth.currentUser;
   const sections = loggedIn
-    ? ['home', 'donorWelcome', 'search', 'requests']
-    : ['home', 'search', 'requests'];
+    ? ['home', 'donorWelcome', 'requestMapSection', 'search', 'requests']
+    : ['home', 'requestMapSection', 'search', 'requests'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
@@ -202,6 +263,7 @@ function startAppListeners() {
   window.subscribeRequests(() => {
     renderRequests();
     updateStats();
+    if (typeof window.renderRequestMap === 'function') window.renderRequestMap();
   });
   if (typeof window.subscribeNotifications === 'function') {
     window.subscribeNotifications(() => {
@@ -216,10 +278,11 @@ window.bootApp = function () {
   if (document.getElementById('requestsList')) renderRequests();
   if (document.getElementById('searchResults')) searchDonors();
   if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
+  if (typeof window.initRequestMap === 'function') window.initRequestMap();
 };
 
 Object.assign(window, {
-  quickSearch, searchDonors, postRequest,
+  quickSearch, searchDonors, postRequest, fetchRequestLocation, clearRequestLocation,
   showDonorContact, respondToRequest, showToast, openModal, closeModal, toggleMenu,
   renderRequests,
 });
