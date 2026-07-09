@@ -16,13 +16,14 @@
     </a>
     <ul class="nav-links">
       <li><a href="index.html#home" data-i18n="nav_home">Home</a></li>
+      <li><a href="index.html#requestMapSection" data-i18n="nav_map">Blood Map</a></li>
+      <li><a href="index.html#search" data-i18n="nav_search">Find Donors</a></li>
+      <li><a href="index.html#requests" data-i18n="nav_requests">Blood Requests</a></li>
       <li><a href="leaderboard.html" class="active" data-i18n="nav_leaderboard">Leaderboard</a></li>
-      <li><a href="index.html#search" data-i18n="nav_search">Find Donor</a></li>
-      <li><a href="index.html#requests" data-i18n="nav_requests">Requests</a></li>
     </ul>
     <div class="nav-right">
       <div class="nav-auth">
-        <button id="navSignIn" class="btn btn-nav-auth" onclick="openAuthModal('signin')" data-i18n="auth_signin">Sign In</button>
+        <a href="index.html#requests" id="navRegisterRecipient" class="btn btn-nav-recipient" data-i18n="nav_register_recipient">Register as Recipient</a>
         <div id="navUserInfo" class="nav-user-info" style="display:none">
           <img id="navUserAvatar" class="nav-user-avatar" alt="" />
           <a href="profile.html" id="navUserName" class="nav-user-name nav-user-link"></a>
@@ -140,12 +141,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/i18n.js?v=11"></script>
-  <script src="js/firebase-config.js?v=11"></script>
-  <script src="js/firestore-db.js?v=11"></script>
-  <script src="js/notifications.js?v=11"></script>
-  <script src="js/auth.js?v=11"></script>
-  <script src="js/app.js?v=11"></script>
-  <script src="js/leaderboard.js?v=11"></script>
+  <script src="js/i18n.js?v=22"></script>
+  <script src="js/firebase-config.js?v=22"></script>
+  <script src="js/firestore-db.js?v=22"></script>
+  <script src="js/notifications.js?v=22"></script>
+  <script src="js/auth.js?v=22"></script>
+  <script src="js/app.js?v=22"></script>
+  <script src="js/leaderboard.js?v=22"></script>
 </body>
 </html>

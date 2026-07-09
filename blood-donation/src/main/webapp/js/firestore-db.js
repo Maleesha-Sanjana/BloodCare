@@ -247,16 +247,17 @@ async function clearAllNotifications() {
   await batch.commit();
 }
 
-async function getLeaderboard(limit = 10) {
-  const db = getDb();
-  const snap = await db.collection(COLLECTIONS.DONORS)
-    .orderBy('donations', 'desc')
-    .limit(50)
-    .get();
-  const unique = dedupeDonors(snap.docs.map(docToObject))
+function rankLeaderboardDonors(donors) {
+  return dedupeDonors(donors)
     .sort((a, b) => (b.donations || 0) - (a.donations || 0))
-    .slice(0, limit);
-  return unique.map((d, i) => ({ rank: i + 1, ...d }));
+    .map((d, i) => ({ rank: i + 1, ...d }));
+}
+
+async function getLeaderboard() {
+  const db = getDb();
+  if (!db) return rankLeaderboardDonors(getDonors());
+  const snap = await db.collection(COLLECTIONS.DONORS).get();
+  return rankLeaderboardDonors(snap.docs.map(docToObject));
 }
 
 async function refreshDonors() {
@@ -375,6 +376,7 @@ window.addNotification = addNotification;
 window.deleteNotification = deleteNotification;
 window.clearAllNotifications = clearAllNotifications;
 window.getLeaderboard = getLeaderboard;
+window.rankLeaderboardDonors = rankLeaderboardDonors;
 window.reloadNotifications = reloadNotifications;
 window.upsertDonorProfile = upsertDonorProfile;
 

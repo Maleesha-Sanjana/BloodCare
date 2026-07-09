@@ -51,7 +51,7 @@ async function renderLeaderboard() {
   container.innerHTML = `<div class="no-results"><p>Loading leaderboard…</p></div>`;
 
   try {
-    const donors = await window.getLeaderboard(10);
+    const donors = await window.getLeaderboard();
     renderLeaderboardRows(donors);
   } catch (err) {
     console.error('Leaderboard:', err);
@@ -61,10 +61,7 @@ async function renderLeaderboard() {
 
 function startLeaderboardListener() {
   window.subscribeDonors(donors => {
-    const ranked = dedupeDonors(donors)
-      .sort((a, b) => (b.donations || 0) - (a.donations || 0))
-      .slice(0, 10)
-      .map((d, i) => ({ rank: i + 1, ...d }));
+    const ranked = window.rankLeaderboardDonors(donors);
     renderLeaderboardRows(ranked);
   });
 }
