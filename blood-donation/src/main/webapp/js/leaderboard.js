@@ -1,4 +1,5 @@
 const RANK_MEDALS = { 1: '🥇', 2: '🥈', 3: '🥉' };
+let leaderboardInited = false;
 
 function escHtml(str) {
   return String(str)
@@ -60,16 +61,21 @@ async function renderLeaderboard() {
 }
 
 function startLeaderboardListener() {
+  if (typeof window.subscribeDonors !== 'function') return;
   window.subscribeDonors(donors => {
-    const ranked = window.rankLeaderboardDonors(donors);
+    const ranked = window.rankLeaderboardDonors
+      ? window.rankLeaderboardDonors(donors)
+      : donors;
     renderLeaderboardRows(ranked);
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (!window.db) return;
-  window.initFirestore(() => {
-    renderLeaderboard();
-    startLeaderboardListener();
-  });
-});
+function initLeaderboard() {
+  if (leaderboardInited || !document.getElementById('leaderboardList')) return;
+  leaderboardInited = true;
+  renderLeaderboard();
+  startLeaderboardListener();
+}
+
+window.initLeaderboard = initLeaderboard;
+window.renderLeaderboard = renderLeaderboard;
