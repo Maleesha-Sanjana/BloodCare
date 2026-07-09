@@ -129,6 +129,10 @@ async function postRequest(e) {
   if (e) e.preventDefault();
   hidePostSuccess();
 
+  if (typeof window.requireAuthForAction === 'function' && !window.requireAuthForAction('postRequest')) {
+    return;
+  }
+
   const hospital = document.getElementById('rHospital')?.value.trim() || '';
   const blood    = getReqSelectValue('rBlood', 'rBloodValue');
   const location = getReqSelectValue('rLocation', 'rLocationValue');

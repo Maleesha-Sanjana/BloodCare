@@ -1,6 +1,9 @@
 // ===== FIREBASE AUTH =====
 const auth = window.auth;
 let currentUser = null;
+let authIntent = 'donor';
+let pendingPostAfterAuth = false;
+let userRole = 'donor';
 
 const AUTH_ERRORS = {
   'auth/email-already-in-use': 'auth_err_email_in_use',
@@ -24,14 +27,34 @@ function authErrorMessage(code) {
   return key ? t(key) : t('auth_err_generic');
 }
 
-function openAuthModal(mode = 'signup') {
-  document.getElementById('authModal').classList.add('open');
+function updateAuthModalCopy(intent) {
+  const titleEl = document.getElementById('authModalTitle');
+  const subEl = document.getElementById('authModalSub');
+  if (!titleEl || !subEl) return;
+
+  const copy = {
+    donor: ['auth_modal_title', 'auth_modal_sub'],
+    recipient: ['auth_modal_recipient_title', 'auth_modal_recipient_sub'],
+    postRequest: ['auth_modal_request_title', 'auth_modal_request_sub'],
+  };
+  const keys = copy[intent] || copy.donor;
+  titleEl.textContent = t(keys[0]);
+  subEl.textContent = t(keys[1]);
+}
+
+function openAuthModal(mode = 'signup', intent = 'donor') {
+  authIntent = intent;
+  const modal = document.getElementById('authModal');
+  if (!modal) return;
+  modal.classList.add('open');
   switchAuthTab(mode);
+  updateAuthModalCopy(intent);
   clearAuthErrors();
 }
 
 function closeAuthModal() {
-  document.getElementById('authModal').classList.remove('open');
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.remove('open');
   clearAuthErrors();
 }
 
@@ -55,6 +78,46 @@ function switchAuthTab(mode) {
   clearAuthErrors();
 }
 
+function scrollToRequests() {
+  const section = document.getElementById('requests');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => document.getElementById('rHospital')?.focus(), 500);
+  }
+}
+
+function scrollToDonorWelcome() {
+  const section = document.getElementById('donorWelcome');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+}
+
+function isRecipientIntent() {
+  return authIntent === 'recipient' || authIntent === 'postRequest';
+}
+
+function handleAuthSuccessRedirect() {
+  if (isRecipientIntent()) {
+    scrollToRequests();
+    if (pendingPostAfterAuth) {
+      pendingPostAfterAuth = false;
+      setTimeout(() => {
+        if (typeof window.postRequest === 'function') window.postRequest();
+      }, 500);
+    }
+    return;
+  }
+  scrollToDonorWelcome();
+}
+
+function requireAuthForAction(intent) {
+  if (currentUser) return true;
+  authIntent = intent;
+  pendingPostAfterAuth = intent === 'postRequest';
+  openAuthModal('signup', intent);
+  showToast(t(intent === 'postRequest' ? 'req_auth_required' : 'auth_signin_required'), 'info');
+  return false;
+}
+
 function handleRegisterRecipientClick(e) {
   if (e) e.preventDefault();
   document.querySelector('.nav-links')?.classList.remove('open');
@@ -64,21 +127,23 @@ function handleRegisterRecipientClick(e) {
     || location.pathname.endsWith('/');
 
   if (!onHome) {
+    sessionStorage.setItem('bloodcare_auth_intent', 'recipient');
     location.href = 'index.html#requests';
     return;
   }
 
-  const section = document.getElementById('requests');
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => document.getElementById('rHospital')?.focus(), 500);
+  if (!currentUser) {
+    openAuthModal('signup', 'recipient');
+    return;
   }
+
+  scrollToRequests();
 }
 
 function handleRegisterClick(e) {
   if (!currentUser) {
     e.preventDefault();
-    openAuthModal('signup');
+    openAuthModal('signup', 'donor');
   }
 }
 
@@ -104,14 +169,13 @@ function renderDonorWelcome(user) {
 
 function updateAuthUI(user) {
   currentUser = user;
-  const recipientBtn   = document.getElementById('navRegisterRecipient');
-  const userInfo       = document.getElementById('navUserInfo');
-  const welcomeSection = document.getElementById('donorWelcome');
-  const heroRegister   = document.getElementById('heroRegisterBtn');
-  const isProfilePage  = location.pathname.endsWith('profile.html');
+  const userInfo              = document.getElementById('navUserInfo');
+  const welcomeSection        = document.getElementById('donorWelcome');
+  const heroRegister          = document.getElementById('heroRegisterBtn');
+  const heroRegisterRecipient = document.getElementById('heroRegisterRecipientBtn');
+  const isProfilePage         = location.pathname.endsWith('profile.html');
 
   if (user) {
-    if (recipientBtn) recipientBtn.style.display = 'none';
     if (userInfo) {
       userInfo.style.display = 'flex';
       const name = user.displayName || user.email.split('@')[0];
@@ -125,15 +189,20 @@ function updateAuthUI(user) {
       }
     }
     if (!isProfilePage) {
-      if (welcomeSection) welcomeSection.style.display = '';
       if (heroRegister) heroRegister.style.display = 'none';
-      renderDonorWelcome(user);
+      if (heroRegisterRecipient) heroRegisterRecipient.style.display = 'none';
+      if (userRole === 'recipient') {
+        if (welcomeSection) welcomeSection.style.display = 'none';
+      } else {
+        if (welcomeSection) welcomeSection.style.display = '';
+        renderDonorWelcome(user);
+      }
     }
   } else {
-    if (recipientBtn) recipientBtn.style.display = 'inline-flex';
     if (userInfo) userInfo.style.display = 'none';
     if (welcomeSection) welcomeSection.style.display = 'none';
     if (heroRegister) heroRegister.style.display = '';
+    if (heroRegisterRecipient) heroRegisterRecipient.style.display = '';
   }
 }
 
@@ -150,8 +219,13 @@ async function signUpWithEmail(e) {
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     await cred.user.sendEmailVerification();
     closeAuthModal();
-    showToast(t('auth_toast_verify'), 'info');
-    document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
+    if (isRecipientIntent()) {
+      showToast(t('auth_toast_recipient_verify'), 'info');
+      scrollToRequests();
+    } else {
+      showToast(t('auth_toast_verify'), 'info');
+      scrollToDonorWelcome();
+    }
   } catch (err) {
     showAuthError(authErrorMessage(err.code));
   } finally {
@@ -172,8 +246,8 @@ async function signInWithEmail(e) {
   try {
     await auth.signInWithEmailAndPassword(email, password);
     closeAuthModal();
-    showToast(t('auth_toast_signin'), 'success');
-    document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
+    showToast(isRecipientIntent() ? t('auth_toast_recipient') : t('auth_toast_signin'), 'success');
+    handleAuthSuccessRedirect();
   } catch (err) {
     showAuthError(authErrorMessage(err.code));
   } finally {
@@ -196,7 +270,7 @@ function setGoogleLoading(loading) {
 function onGoogleSignInSuccess() {
   closeAuthModal();
   showToast(t('auth_toast_google'), 'success');
-  document.getElementById('donorWelcome').scrollIntoView({ behavior: 'smooth' });
+  handleAuthSuccessRedirect();
 }
 
 async function signInWithGoogle() {
@@ -212,18 +286,17 @@ async function signInWithGoogle() {
   } catch (err) {
     console.error('Google sign-in:', err.code, err.message);
 
-    // Fallback to full-page redirect if popup is blocked or closed
     if (['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(err.code)) {
       try {
         await auth.signInWithRedirect(provider);
         return;
       } catch (redirectErr) {
         showAuthError(authErrorMessage(redirectErr.code) || redirectErr.message);
-        openAuthModal('signin');
+        openAuthModal('signin', authIntent);
       }
     } else {
       showAuthError(authErrorMessage(err.code) || err.message);
-      openAuthModal('signin');
+      openAuthModal('signin', authIntent);
     }
   } finally {
     setGoogleLoading(false);
@@ -240,7 +313,7 @@ function handleGoogleRedirectResult() {
       if (err && err.code) {
         console.error('Google redirect:', err.code, err.message);
         showAuthError(authErrorMessage(err.code) || err.message);
-        openAuthModal('signin');
+        openAuthModal('signin', authIntent);
       }
     });
 }
@@ -259,6 +332,7 @@ function showToast(msg, type = 'success') {
 async function signOut() {
   try {
     await auth.signOut();
+    userRole = 'donor';
     showToast(t('auth_toast_signout'), 'info');
     if (location.pathname.endsWith('profile.html')) {
       setTimeout(() => { location.href = 'index.html'; }, 600);
@@ -268,10 +342,26 @@ async function signOut() {
   }
 }
 
+function initAuthFromSession() {
+  const stored = sessionStorage.getItem('bloodcare_auth_intent');
+  if (stored === 'recipient') {
+    sessionStorage.removeItem('bloodcare_auth_intent');
+    authIntent = 'recipient';
+    if (!currentUser) {
+      setTimeout(() => openAuthModal('signup', 'recipient'), 400);
+    } else {
+      scrollToRequests();
+    }
+  }
+}
+
 auth.onAuthStateChanged(user => {
   updateAuthUI(user);
-  if (user && typeof window.upsertDonorProfile === 'function') {
-    window.upsertDonorProfile(user).catch(err => console.error('Donor profile:', err));
+  if (user && typeof window.upsertUserProfile === 'function') {
+    const role = isRecipientIntent() ? 'recipient' : 'donor';
+    window.upsertUserProfile(user, role)
+      .then(role => { userRole = role || 'donor'; updateAuthUI(user); })
+      .catch(err => console.error('User profile:', err));
   }
   if (typeof window.reloadNotifications === 'function') {
     window.reloadNotifications()
@@ -285,12 +375,7 @@ auth.onAuthStateChanged(user => {
 
 handleGoogleRedirectResult();
 
-function initRecipientHashScroll() {
-  if (location.hash !== '#requests') return;
-  setTimeout(() => document.getElementById('rHospital')?.focus(), 800);
-}
-
-document.addEventListener('DOMContentLoaded', initRecipientHashScroll);
+document.addEventListener('DOMContentLoaded', initAuthFromSession);
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeAuthModal();
@@ -305,4 +390,7 @@ window.signInWithGoogle = signInWithGoogle;
 window.signOut = signOut;
 window.handleRegisterClick = handleRegisterClick;
 window.handleRegisterRecipientClick = handleRegisterRecipientClick;
+window.requireAuthForAction = requireAuthForAction;
+window.getCurrentUser = () => currentUser;
+window.getUserRole = () => userRole;
 window.toggleMenu = toggleMenu;

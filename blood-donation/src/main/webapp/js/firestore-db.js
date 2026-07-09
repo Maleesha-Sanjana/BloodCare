@@ -181,26 +181,40 @@ async function reloadNotifications() {
   return notificationsCache;
 }
 
-async function upsertDonorProfile(user) {
-  if (!user) return;
+async function upsertUserProfile(user, role = 'donor') {
+  if (!user) return role;
   const db = getDb();
-  if (!db) return;
+  if (!db) return role;
   const ref = db.collection(COLLECTIONS.DONORS).doc(user.uid);
   const snap = await ref.get();
-  if (snap.exists) return;
+
+  if (snap.exists) {
+    const existingRole = snap.data().role || 'donor';
+    if (role === 'recipient' && existingRole === 'donor') {
+      await ref.set({ role: 'recipient' }, { merge: true });
+      return 'recipient';
+    }
+    return existingRole;
+  }
 
   await ref.set({
     uid: user.uid,
+    role,
     name: user.displayName || user.email.split('@')[0],
     email: user.email || '',
     age: null,
     blood: '',
     phone: '',
     location: '',
-    donations: 0,
+    donations: role === 'donor' ? 0 : null,
     date: new Date().toISOString().split('T')[0],
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   });
+  return role;
+}
+
+async function upsertDonorProfile(user) {
+  return upsertUserProfile(user, 'donor');
 }
 
 async function addRequest(req) {
@@ -210,6 +224,13 @@ async function addRequest(req) {
   const payload = { ...req };
   if (payload.lat == null) delete payload.lat;
   if (payload.lng == null) delete payload.lng;
+
+  const user = window.auth?.currentUser;
+  if (user) {
+    payload.uid = user.uid;
+    if (user.email) payload.postedBy = user.email;
+    if (user.displayName) payload.postedByName = user.displayName;
+  }
 
   const ref = await db.collection(COLLECTIONS.REQUESTS).add({
     ...payload,
@@ -378,6 +399,7 @@ window.clearAllNotifications = clearAllNotifications;
 window.getLeaderboard = getLeaderboard;
 window.rankLeaderboardDonors = rankLeaderboardDonors;
 window.reloadNotifications = reloadNotifications;
+window.upsertUserProfile = upsertUserProfile;
 window.upsertDonorProfile = upsertDonorProfile;
 
 // ===== HOME STATS (load + count-up animation) =====
