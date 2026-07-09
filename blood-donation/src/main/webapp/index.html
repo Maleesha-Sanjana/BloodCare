@@ -106,23 +106,23 @@
         <div class="form-group">
           <label data-i18n="form_blood">Blood Group</label>
           <div class="custom-select-wrap" id="bloodWrap">
-            <button type="button" class="custom-select-trigger" id="bloodTrigger" onclick="toggleDropdown('blood')">
+            <button type="button" class="custom-select-trigger" id="bloodTrigger">
               <span class="cs-icon">🩸</span>
               <span class="cs-value" id="bloodValue">All Groups</span>
               <span class="cs-arrow">▾</span>
             </button>
             <div class="custom-select-dropdown" id="bloodDropdown">
-              <div class="cs-option cs-selected" data-value="" onclick="pickBlood(this, '', 'All Groups')">
+              <div class="cs-option cs-selected" data-value="">
                 <span class="cs-check">✓</span> All Groups
               </div>
-              <div class="cs-option" data-value="A+"  onclick="pickBlood(this, 'A+',  'A+')"><span class="cs-check"></span><span class="cs-badge">A+</span></div>
-              <div class="cs-option" data-value="A-"  onclick="pickBlood(this, 'A-',  'A−')"><span class="cs-check"></span><span class="cs-badge">A−</span></div>
-              <div class="cs-option" data-value="B+"  onclick="pickBlood(this, 'B+',  'B+')"><span class="cs-check"></span><span class="cs-badge">B+</span></div>
-              <div class="cs-option" data-value="B-"  onclick="pickBlood(this, 'B-',  'B−')"><span class="cs-check"></span><span class="cs-badge">B−</span></div>
-              <div class="cs-option" data-value="AB+" onclick="pickBlood(this, 'AB+', 'AB+')"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
-              <div class="cs-option" data-value="AB-" onclick="pickBlood(this, 'AB-', 'AB−')"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
-              <div class="cs-option" data-value="O+"  onclick="pickBlood(this, 'O+',  'O+')"><span class="cs-check"></span><span class="cs-badge">O+</span></div>
-              <div class="cs-option" data-value="O-"  onclick="pickBlood(this, 'O-',  'O−')"><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+              <div class="cs-option" data-value="A+" ><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+              <div class="cs-option" data-value="A-" ><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+              <div class="cs-option" data-value="B+" ><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+              <div class="cs-option" data-value="B-" ><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+              <div class="cs-option" data-value="AB+"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+              <div class="cs-option" data-value="AB-"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+              <div class="cs-option" data-value="O+" ><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+              <div class="cs-option" data-value="O-" ><span class="cs-check"></span><span class="cs-badge">O−</span></div>
             </div>
           </div>
           <select id="sBlood" style="display:none">
@@ -136,42 +136,42 @@
         <div class="form-group">
           <label data-i18n="form_location">District / Location</label>
           <div class="custom-select-wrap" id="locationWrap">
-            <button type="button" class="custom-select-trigger" id="locationTrigger" onclick="toggleDropdown('location')">
+            <button type="button" class="custom-select-trigger" id="locationTrigger">
               <span class="cs-icon">📍</span>
               <span class="cs-value" id="locationValue">All Districts</span>
               <span class="cs-arrow">▾</span>
             </button>
             <div class="custom-select-dropdown" id="locationDropdown">
               <div class="cs-search-wrap">
-                <input type="text" class="cs-search" placeholder="Search district…" oninput="filterLocationOptions(this.value)" />
+                <input type="text" class="cs-search" placeholder="Search district…" />
               </div>
               <div class="cs-options-list" id="locationOptionsList">
-                <div class="cs-option cs-selected" data-value="" onclick="pickLocation(this, '', 'All Districts')"><span class="cs-check">✓</span> All Districts</div>
-                <div class="cs-option" data-value="Colombo"      onclick="pickLocation(this,'Colombo','Colombo')"><span class="cs-check"></span>Colombo</div>
-                <div class="cs-option" data-value="Gampaha"      onclick="pickLocation(this,'Gampaha','Gampaha')"><span class="cs-check"></span>Gampaha</div>
-                <div class="cs-option" data-value="Kalutara"     onclick="pickLocation(this,'Kalutara','Kalutara')"><span class="cs-check"></span>Kalutara</div>
-                <div class="cs-option" data-value="Kandy"        onclick="pickLocation(this,'Kandy','Kandy')"><span class="cs-check"></span>Kandy</div>
-                <div class="cs-option" data-value="Matale"       onclick="pickLocation(this,'Matale','Matale')"><span class="cs-check"></span>Matale</div>
-                <div class="cs-option" data-value="Nuwara Eliya" onclick="pickLocation(this,'Nuwara Eliya','Nuwara Eliya')"><span class="cs-check"></span>Nuwara Eliya</div>
-                <div class="cs-option" data-value="Galle"        onclick="pickLocation(this,'Galle','Galle')"><span class="cs-check"></span>Galle</div>
-                <div class="cs-option" data-value="Matara"       onclick="pickLocation(this,'Matara','Matara')"><span class="cs-check"></span>Matara</div>
-                <div class="cs-option" data-value="Hambantota"   onclick="pickLocation(this,'Hambantota','Hambantota')"><span class="cs-check"></span>Hambantota</div>
-                <div class="cs-option" data-value="Jaffna"       onclick="pickLocation(this,'Jaffna','Jaffna')"><span class="cs-check"></span>Jaffna</div>
-                <div class="cs-option" data-value="Kilinochchi"  onclick="pickLocation(this,'Kilinochchi','Kilinochchi')"><span class="cs-check"></span>Kilinochchi</div>
-                <div class="cs-option" data-value="Mannar"       onclick="pickLocation(this,'Mannar','Mannar')"><span class="cs-check"></span>Mannar</div>
-                <div class="cs-option" data-value="Vavuniya"     onclick="pickLocation(this,'Vavuniya','Vavuniya')"><span class="cs-check"></span>Vavuniya</div>
-                <div class="cs-option" data-value="Mullaitivu"   onclick="pickLocation(this,'Mullaitivu','Mullaitivu')"><span class="cs-check"></span>Mullaitivu</div>
-                <div class="cs-option" data-value="Batticaloa"   onclick="pickLocation(this,'Batticaloa','Batticaloa')"><span class="cs-check"></span>Batticaloa</div>
-                <div class="cs-option" data-value="Ampara"       onclick="pickLocation(this,'Ampara','Ampara')"><span class="cs-check"></span>Ampara</div>
-                <div class="cs-option" data-value="Trincomalee"  onclick="pickLocation(this,'Trincomalee','Trincomalee')"><span class="cs-check"></span>Trincomalee</div>
-                <div class="cs-option" data-value="Kurunegala"   onclick="pickLocation(this,'Kurunegala','Kurunegala')"><span class="cs-check"></span>Kurunegala</div>
-                <div class="cs-option" data-value="Puttalam"     onclick="pickLocation(this,'Puttalam','Puttalam')"><span class="cs-check"></span>Puttalam</div>
-                <div class="cs-option" data-value="Anuradhapura" onclick="pickLocation(this,'Anuradhapura','Anuradhapura')"><span class="cs-check"></span>Anuradhapura</div>
-                <div class="cs-option" data-value="Polonnaruwa"  onclick="pickLocation(this,'Polonnaruwa','Polonnaruwa')"><span class="cs-check"></span>Polonnaruwa</div>
-                <div class="cs-option" data-value="Badulla"      onclick="pickLocation(this,'Badulla','Badulla')"><span class="cs-check"></span>Badulla</div>
-                <div class="cs-option" data-value="Monaragala"   onclick="pickLocation(this,'Monaragala','Monaragala')"><span class="cs-check"></span>Monaragala</div>
-                <div class="cs-option" data-value="Ratnapura"    onclick="pickLocation(this,'Ratnapura','Ratnapura')"><span class="cs-check"></span>Ratnapura</div>
-                <div class="cs-option" data-value="Kegalle"      onclick="pickLocation(this,'Kegalle','Kegalle')"><span class="cs-check"></span>Kegalle</div>
+                <div class="cs-option cs-selected" data-value=""><span class="cs-check">✓</span> All Districts</div>
+                <div class="cs-option" data-value="Colombo"     ><span class="cs-check"></span>Colombo</div>
+                <div class="cs-option" data-value="Gampaha"     ><span class="cs-check"></span>Gampaha</div>
+                <div class="cs-option" data-value="Kalutara"    ><span class="cs-check"></span>Kalutara</div>
+                <div class="cs-option" data-value="Kandy"       ><span class="cs-check"></span>Kandy</div>
+                <div class="cs-option" data-value="Matale"      ><span class="cs-check"></span>Matale</div>
+                <div class="cs-option" data-value="Nuwara Eliya"><span class="cs-check"></span>Nuwara Eliya</div>
+                <div class="cs-option" data-value="Galle"       ><span class="cs-check"></span>Galle</div>
+                <div class="cs-option" data-value="Matara"      ><span class="cs-check"></span>Matara</div>
+                <div class="cs-option" data-value="Hambantota"  ><span class="cs-check"></span>Hambantota</div>
+                <div class="cs-option" data-value="Jaffna"      ><span class="cs-check"></span>Jaffna</div>
+                <div class="cs-option" data-value="Kilinochchi" ><span class="cs-check"></span>Kilinochchi</div>
+                <div class="cs-option" data-value="Mannar"      ><span class="cs-check"></span>Mannar</div>
+                <div class="cs-option" data-value="Vavuniya"    ><span class="cs-check"></span>Vavuniya</div>
+                <div class="cs-option" data-value="Mullaitivu"  ><span class="cs-check"></span>Mullaitivu</div>
+                <div class="cs-option" data-value="Batticaloa"  ><span class="cs-check"></span>Batticaloa</div>
+                <div class="cs-option" data-value="Ampara"      ><span class="cs-check"></span>Ampara</div>
+                <div class="cs-option" data-value="Trincomalee" ><span class="cs-check"></span>Trincomalee</div>
+                <div class="cs-option" data-value="Kurunegala"  ><span class="cs-check"></span>Kurunegala</div>
+                <div class="cs-option" data-value="Puttalam"    ><span class="cs-check"></span>Puttalam</div>
+                <div class="cs-option" data-value="Anuradhapura"><span class="cs-check"></span>Anuradhapura</div>
+                <div class="cs-option" data-value="Polonnaruwa" ><span class="cs-check"></span>Polonnaruwa</div>
+                <div class="cs-option" data-value="Badulla"     ><span class="cs-check"></span>Badulla</div>
+                <div class="cs-option" data-value="Monaragala"  ><span class="cs-check"></span>Monaragala</div>
+                <div class="cs-option" data-value="Ratnapura"   ><span class="cs-check"></span>Ratnapura</div>
+                <div class="cs-option" data-value="Kegalle"     ><span class="cs-check"></span>Kegalle</div>
               </div>
             </div>
           </div>
@@ -215,20 +215,20 @@
           <div class="form-group">
             <label data-i18n="form_blood">Blood Group Needed</label>
             <div class="custom-select-wrap" id="rBloodWrap">
-              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rBlood')">
+              <button type="button" class="custom-select-trigger">
                 <span class="cs-icon">🩸</span>
                 <span class="cs-value" id="rBloodValue">-- Select --</span>
                 <span class="cs-arrow">▾</span>
               </button>
               <div class="custom-select-dropdown" id="rBloodDropdown">
-                <div class="cs-option" data-value="A+"  onclick="pickReqBlood(this,'A+','A+')"><span class="cs-check"></span><span class="cs-badge">A+</span></div>
-                <div class="cs-option" data-value="A-"  onclick="pickReqBlood(this,'A-','A−')"><span class="cs-check"></span><span class="cs-badge">A−</span></div>
-                <div class="cs-option" data-value="B+"  onclick="pickReqBlood(this,'B+','B+')"><span class="cs-check"></span><span class="cs-badge">B+</span></div>
-                <div class="cs-option" data-value="B-"  onclick="pickReqBlood(this,'B-','B−')"><span class="cs-check"></span><span class="cs-badge">B−</span></div>
-                <div class="cs-option" data-value="AB+" onclick="pickReqBlood(this,'AB+','AB+')"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
-                <div class="cs-option" data-value="AB-" onclick="pickReqBlood(this,'AB-','AB−')"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
-                <div class="cs-option" data-value="O+"  onclick="pickReqBlood(this,'O+','O+')"><span class="cs-check"></span><span class="cs-badge">O+</span></div>
-                <div class="cs-option" data-value="O-"  onclick="pickReqBlood(this,'O-','O−')"><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+                <div class="cs-option" data-value="A+" ><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+                <div class="cs-option" data-value="A-" ><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+                <div class="cs-option" data-value="B+" ><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+                <div class="cs-option" data-value="B-" ><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+                <div class="cs-option" data-value="AB+"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+                <div class="cs-option" data-value="AB-"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+                <div class="cs-option" data-value="O+" ><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+                <div class="cs-option" data-value="O-" ><span class="cs-check"></span><span class="cs-badge">O−</span></div>
               </div>
             </div>
             <select id="rBlood" style="display:none" required>
@@ -242,41 +242,41 @@
           <div class="form-group">
             <label data-i18n="form_location">Location</label>
             <div class="custom-select-wrap" id="rLocationWrap">
-              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLocation')">
+              <button type="button" class="custom-select-trigger">
                 <span class="cs-icon">📍</span>
                 <span class="cs-value" id="rLocationValue">-- Select District --</span>
                 <span class="cs-arrow">▾</span>
               </button>
               <div class="custom-select-dropdown" id="rLocationDropdown">
                 <div class="cs-search-wrap">
-                  <input type="text" class="cs-search" placeholder="Search district…" oninput="filterReqLocationOptions(this.value)" />
+                  <input type="text" class="cs-search" placeholder="Search district…" />
                 </div>
                 <div class="cs-options-list" id="rLocationOptionsList">
-                  <div class="cs-option" data-value="Colombo"      onclick="pickReqLocation(this,'Colombo')"><span class="cs-check"></span>Colombo</div>
-                  <div class="cs-option" data-value="Gampaha"      onclick="pickReqLocation(this,'Gampaha')"><span class="cs-check"></span>Gampaha</div>
-                  <div class="cs-option" data-value="Kalutara"     onclick="pickReqLocation(this,'Kalutara')"><span class="cs-check"></span>Kalutara</div>
-                  <div class="cs-option" data-value="Kandy"        onclick="pickReqLocation(this,'Kandy')"><span class="cs-check"></span>Kandy</div>
-                  <div class="cs-option" data-value="Matale"       onclick="pickReqLocation(this,'Matale')"><span class="cs-check"></span>Matale</div>
-                  <div class="cs-option" data-value="Nuwara Eliya" onclick="pickReqLocation(this,'Nuwara Eliya')"><span class="cs-check"></span>Nuwara Eliya</div>
-                  <div class="cs-option" data-value="Galle"        onclick="pickReqLocation(this,'Galle')"><span class="cs-check"></span>Galle</div>
-                  <div class="cs-option" data-value="Matara"       onclick="pickReqLocation(this,'Matara')"><span class="cs-check"></span>Matara</div>
-                  <div class="cs-option" data-value="Hambantota"   onclick="pickReqLocation(this,'Hambantota')"><span class="cs-check"></span>Hambantota</div>
-                  <div class="cs-option" data-value="Jaffna"       onclick="pickReqLocation(this,'Jaffna')"><span class="cs-check"></span>Jaffna</div>
-                  <div class="cs-option" data-value="Kilinochchi"  onclick="pickReqLocation(this,'Kilinochchi')"><span class="cs-check"></span>Kilinochchi</div>
-                  <div class="cs-option" data-value="Mannar"       onclick="pickReqLocation(this,'Mannar')"><span class="cs-check"></span>Mannar</div>
-                  <div class="cs-option" data-value="Vavuniya"     onclick="pickReqLocation(this,'Vavuniya')"><span class="cs-check"></span>Vavuniya</div>
-                  <div class="cs-option" data-value="Mullaitivu"   onclick="pickReqLocation(this,'Mullaitivu')"><span class="cs-check"></span>Mullaitivu</div>
-                  <div class="cs-option" data-value="Batticaloa"   onclick="pickReqLocation(this,'Batticaloa')"><span class="cs-check"></span>Batticaloa</div>
-                  <div class="cs-option" data-value="Ampara"       onclick="pickReqLocation(this,'Ampara')"><span class="cs-check"></span>Ampara</div>
-                  <div class="cs-option" data-value="Trincomalee"  onclick="pickReqLocation(this,'Trincomalee')"><span class="cs-check"></span>Trincomalee</div>
-                  <div class="cs-option" data-value="Kurunegala"   onclick="pickReqLocation(this,'Kurunegala')"><span class="cs-check"></span>Kurunegala</div>
-                  <div class="cs-option" data-value="Puttalam"     onclick="pickReqLocation(this,'Puttalam')"><span class="cs-check"></span>Puttalam</div>
-                  <div class="cs-option" data-value="Anuradhapura" onclick="pickReqLocation(this,'Anuradhapura')"><span class="cs-check"></span>Anuradhapura</div>
-                  <div class="cs-option" data-value="Polonnaruwa"  onclick="pickReqLocation(this,'Polonnaruwa')"><span class="cs-check"></span>Polonnaruwa</div>
-                  <div class="cs-option" data-value="Badulla"      onclick="pickReqLocation(this,'Badulla')"><span class="cs-check"></span>Badulla</div>
-                  <div class="cs-option" data-value="Monaragala"   onclick="pickReqLocation(this,'Monaragala')"><span class="cs-check"></span>Monaragala</div>
-                  <div class="cs-option" data-value="Ratnapura"    onclick="pickReqLocation(this,'Ratnapura')"><span class="cs-check"></span>Ratnapura</div>
-                  <div class="cs-option" data-value="Kegalle"      onclick="pickReqLocation(this,'Kegalle')"><span class="cs-check"></span>Kegalle</div>
+                  <div class="cs-option" data-value="Colombo"     ><span class="cs-check"></span>Colombo</div>
+                  <div class="cs-option" data-value="Gampaha"     ><span class="cs-check"></span>Gampaha</div>
+                  <div class="cs-option" data-value="Kalutara"    ><span class="cs-check"></span>Kalutara</div>
+                  <div class="cs-option" data-value="Kandy"       ><span class="cs-check"></span>Kandy</div>
+                  <div class="cs-option" data-value="Matale"      ><span class="cs-check"></span>Matale</div>
+                  <div class="cs-option" data-value="Nuwara Eliya"><span class="cs-check"></span>Nuwara Eliya</div>
+                  <div class="cs-option" data-value="Galle"       ><span class="cs-check"></span>Galle</div>
+                  <div class="cs-option" data-value="Matara"      ><span class="cs-check"></span>Matara</div>
+                  <div class="cs-option" data-value="Hambantota"  ><span class="cs-check"></span>Hambantota</div>
+                  <div class="cs-option" data-value="Jaffna"      ><span class="cs-check"></span>Jaffna</div>
+                  <div class="cs-option" data-value="Kilinochchi" ><span class="cs-check"></span>Kilinochchi</div>
+                  <div class="cs-option" data-value="Mannar"      ><span class="cs-check"></span>Mannar</div>
+                  <div class="cs-option" data-value="Vavuniya"    ><span class="cs-check"></span>Vavuniya</div>
+                  <div class="cs-option" data-value="Mullaitivu"  ><span class="cs-check"></span>Mullaitivu</div>
+                  <div class="cs-option" data-value="Batticaloa"  ><span class="cs-check"></span>Batticaloa</div>
+                  <div class="cs-option" data-value="Ampara"      ><span class="cs-check"></span>Ampara</div>
+                  <div class="cs-option" data-value="Trincomalee" ><span class="cs-check"></span>Trincomalee</div>
+                  <div class="cs-option" data-value="Kurunegala"  ><span class="cs-check"></span>Kurunegala</div>
+                  <div class="cs-option" data-value="Puttalam"    ><span class="cs-check"></span>Puttalam</div>
+                  <div class="cs-option" data-value="Anuradhapura"><span class="cs-check"></span>Anuradhapura</div>
+                  <div class="cs-option" data-value="Polonnaruwa" ><span class="cs-check"></span>Polonnaruwa</div>
+                  <div class="cs-option" data-value="Badulla"     ><span class="cs-check"></span>Badulla</div>
+                  <div class="cs-option" data-value="Monaragala"  ><span class="cs-check"></span>Monaragala</div>
+                  <div class="cs-option" data-value="Ratnapura"   ><span class="cs-check"></span>Ratnapura</div>
+                  <div class="cs-option" data-value="Kegalle"     ><span class="cs-check"></span>Kegalle</div>
                 </div>
               </div>
             </div>
@@ -303,25 +303,25 @@
           <div class="form-group">
             <label data-i18n="req_level">Emergency Level</label>
             <div class="custom-select-wrap" id="rLevelWrap">
-              <button type="button" class="custom-select-trigger" onclick="toggleDropdown('rLevel')">
+              <button type="button" class="custom-select-trigger">
                 <span class="cs-icon">⚡</span>
                 <span class="cs-value" id="rLevelValue">-- Select --</span>
                 <span class="cs-arrow">▾</span>
               </button>
               <div class="custom-select-dropdown" id="rLevelDropdown">
-                <div class="cs-option cs-level-critical" data-value="critical" onclick="pickReqLevel(this,'critical','🔴 Critical')">
+                <div class="cs-option cs-level-critical" data-value="critical">
                   <span class="cs-check"></span>
                   <span class="cs-level-dot critical"></span>
                   <span>Critical</span>
                   <span class="cs-level-desc">Immediate — life at risk</span>
                 </div>
-                <div class="cs-option cs-level-urgent" data-value="urgent" onclick="pickReqLevel(this,'urgent','🟠 Urgent')">
+                <div class="cs-option cs-level-urgent" data-value="urgent">
                   <span class="cs-check"></span>
                   <span class="cs-level-dot urgent"></span>
                   <span>Urgent</span>
                   <span class="cs-level-desc">Needed within hours</span>
                 </div>
-                <div class="cs-option cs-level-normal" data-value="normal" onclick="pickReqLevel(this,'normal','🟢 Normal')">
+                <div class="cs-option cs-level-normal" data-value="normal">
                   <span class="cs-check"></span>
                   <span class="cs-level-dot normal"></span>
                   <span>Normal</span>
@@ -444,10 +444,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/i18n.js?v=5"></script>
-  <script src="js/firebase-config.js?v=5"></script>
-  <script src="js/firestore-db.js?v=5"></script>
-  <script src="js/auth.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/i18n.js?v=7"></script>
+  <script src="js/dropdowns.js?v=7"></script>
+  <script src="js/firebase-config.js?v=7"></script>
+  <script src="js/firestore-db.js?v=7"></script>
+  <script src="js/auth.js?v=7"></script>
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>
