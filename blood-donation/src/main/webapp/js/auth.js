@@ -225,9 +225,8 @@ function handleGoogleRedirectResult() {
     });
 }
 
-let toastTimer;
 function showToast(msg, type = 'success') {
-  if (typeof window.showToast === 'function' && window.showToast !== showToast) {
+  if (typeof window.showToast === 'function') {
     window.showToast(msg, type);
     return;
   }
@@ -235,8 +234,6 @@ function showToast(msg, type = 'success') {
   if (!toast) return;
   toast.textContent = msg;
   toast.className = `toast ${type} show`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 4500);
 }
 
 async function signOut() {

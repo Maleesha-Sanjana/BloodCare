@@ -17,4 +17,4 @@ firebase.initializeApp(firebaseConfig);
 window.auth = firebase.auth();
 window.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 window.db = firebase.firestore();
-window.db.settings({ experimentalForceLongPolling: true });
+// Do not force long-polling — Safari blocks those XHR Listen channels with CORS errors.

@@ -6,9 +6,25 @@
   let markerLayer = null;
   let mapReady = false;
   let initAttempts = 0;
+  let initialFitDone = false;
+  let userAdjustedView = false;
 
   const SL_CENTER = [7.8731, 80.7718];
   const SL_ZOOM = 7;
+
+  function lockUserView() {
+    userAdjustedView = true;
+  }
+
+  function fitMapToMarkers(bounds) {
+    if (!map || !bounds.length) return;
+    if (bounds.length === 1) {
+      map.setView(bounds[0], 10);
+    } else {
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
+    }
+    initialFitDone = true;
+  }
 
   function esc(str) {
     return String(str)
@@ -83,14 +99,18 @@
     }
   }
 
-  function renderMarkers(requests) {
+  function renderMarkers(requests, options) {
     if (!map || !markerLayer) return;
+
+    const opts = options || {};
+    const forceFit = opts.forceFit === true;
+    const shouldFit = forceFit || (!userAdjustedView && !initialFitDone);
 
     markerLayer.clearLayers();
     const list = requests || (typeof window.getRequests === 'function' ? window.getRequests() : []);
 
     if (!list.length) {
-      map.setView(SL_CENTER, SL_ZOOM);
+      if (shouldFit) map.setView(SL_CENTER, SL_ZOOM);
       return;
     }
 
@@ -118,11 +138,7 @@
       markerLayer.addLayer(marker);
     });
 
-    if (bounds.length === 1) {
-      map.setView(bounds[0], 10);
-    } else {
-      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 11 });
-    }
+    if (shouldFit) fitMapToMarkers(bounds);
   }
 
   function fixMapSize() {
@@ -175,6 +191,8 @@
         scrollWheelZoom: true,
         zoomControl: true,
       }).setView(SL_CENTER, SL_ZOOM);
+
+      map.on('zoomend dragend', lockUserView);
 
       addTileLayer();
       markerLayer = L.layerGroup().addTo(map);

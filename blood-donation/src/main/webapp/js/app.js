@@ -66,6 +66,43 @@ function showDonorContact(id) {
 // ===== DONATION REQUESTS =====
 // GPS handled in gps.js (fetchRequestLocation, clearRequestLocation)
 
+function getReqSelectValue(selectId, displayId) {
+  const sel = document.getElementById(selectId);
+  if (sel && sel.value && sel.value.trim()) return sel.value.trim();
+
+  const display = (document.getElementById(displayId)?.textContent || '').trim();
+  if (!display || display.startsWith('--')) return '';
+
+  if (selectId === 'rLevel') {
+    if (/critical/i.test(display)) return 'critical';
+    if (/urgent/i.test(display)) return 'urgent';
+    if (/normal/i.test(display)) return 'normal';
+  }
+
+  if (selectId === 'rBlood') {
+    return display.replace(/\u2212/g, '-').trim();
+  }
+
+  return display.replace(/^📍\s*/, '').trim();
+}
+
+function hidePostSuccess() {
+  const el = document.getElementById('postSuccessAlert');
+  if (el) el.hidden = true;
+}
+
+function showPostSuccess(req) {
+  const el = document.getElementById('postSuccessAlert');
+  const title = document.getElementById('postSuccessTitle');
+  const msg = document.getElementById('postSuccessMsg');
+  if (el) {
+    if (title) title.textContent = t('success_request_title');
+    if (msg) msg.textContent = `${req.hospital} — ${req.blood} (${req.location}) ${t('success_saved_db')}`;
+    el.hidden = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
 function showSuccessModal(title, message, detailsHtml) {
   const content = document.getElementById('modalContent');
   if (!content) {
@@ -80,27 +117,36 @@ function showSuccessModal(title, message, detailsHtml) {
       ${detailsHtml || ''}
       <button type="button" class="btn btn-primary full-width success-modal-btn" onclick="closeModal()">${t('success_ok')}</button>
     </div>`;
-  openModal();
+  const modal = document.getElementById('modal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.zIndex = '10050';
+  }
   showToast(message, 'success');
 }
 
 async function postRequest(e) {
-  e.preventDefault();
+  if (e) e.preventDefault();
+  hidePostSuccess();
 
-  const hospital = document.getElementById('rHospital').value.trim();
-  const blood    = document.getElementById('rBlood').value;
-  const location = document.getElementById('rLocation').value;
-  const contact  = document.getElementById('rContact').value.trim();
-  const level    = document.getElementById('rLevel').value;
-  const units    = parseInt(document.getElementById('rUnits').value, 10);
+  const hospital = document.getElementById('rHospital')?.value.trim() || '';
+  const blood    = getReqSelectValue('rBlood', 'rBloodValue');
+  const location = getReqSelectValue('rLocation', 'rLocationValue');
+  const contact  = document.getElementById('rContact')?.value.trim() || '';
+  const level    = getReqSelectValue('rLevel', 'rLevelValue');
+  const units    = parseInt(document.getElementById('rUnits')?.value, 10);
 
-  if (!hospital || !blood || !location || !contact || !level || !units) {
+  if (!hospital || !blood || !location || !contact || !level || !units || units < 1) {
     showToast(t('req_form_incomplete'), 'error');
     return;
   }
 
   const submitBtn = document.querySelector('#requestForm button[type="submit"]');
-  if (submitBtn) submitBtn.disabled = true;
+  const prevBtnText = submitBtn?.textContent;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('req_saving');
+  }
 
   const req = {
     hospital,
@@ -113,15 +159,23 @@ async function postRequest(e) {
     time: new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
   };
 
-  const lat = parseFloat(document.getElementById('rLat').value);
-  const lng = parseFloat(document.getElementById('rLng').value);
+  const lat = parseFloat(document.getElementById('rLat')?.value);
+  const lng = parseFloat(document.getElementById('rLng')?.value);
   if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
     req.lat = lat;
     req.lng = lng;
+  } else if (window.DISTRICT_COORDS?.[location]) {
+    req.lat = window.DISTRICT_COORDS[location][0];
+    req.lng = window.DISTRICT_COORDS[location][1];
   }
 
   try {
-    await window.addRequest(req);
+    if (typeof window.addRequest !== 'function') {
+      throw new Error('Database not ready');
+    }
+
+    const requestId = await window.addRequest(req);
+    req.id = requestId;
 
     try {
       const levelLabel = { critical: '🚨 CRITICAL', urgent: '⚠️ URGENT', normal: '📋 Normal' }[req.level];
@@ -141,10 +195,13 @@ async function postRequest(e) {
     window.resetReqDropdowns();
     if (typeof window.clearRequestLocation === 'function') window.clearRequestLocation();
 
+    renderRequests();
+
     const gpsNote = req.lat != null
       ? `<p class="success-detail-row">📌 ${t('success_gps_pinned')}</p>`
       : '';
 
+    showPostSuccess(req);
     showSuccessModal(
       t('success_request_title'),
       t('toast_request'),
@@ -153,16 +210,32 @@ async function postRequest(e) {
         <p class="success-detail-row">🩸 ${escHtml(req.blood)} &nbsp;|&nbsp; ${req.units} ${t('req_units').toLowerCase()}</p>
         <p class="success-detail-row">📍 ${escHtml(req.location)} &nbsp;|&nbsp; <span class="req-badge ${req.level}">${req.level.toUpperCase()}</span></p>
         ${gpsNote}
+        <p class="success-detail-row muted">${t('success_saved_db')}</p>
       </div>`
     );
 
-    if (typeof window.renderRequestMap === 'function') window.renderRequestMap();
+    if (typeof window.renderRequestMap === 'function') {
+      window.renderRequestMap(null, { forceFit: true });
+      setTimeout(() => {
+        document.getElementById('requestMapSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400);
+    }
   } catch (err) {
     console.error('postRequest:', err);
-    showToast(t('req_post_failed'), 'error');
+    showToast(err.message || t('req_post_failed'), 'error');
   } finally {
-    if (submitBtn) submitBtn.disabled = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (prevBtnText) submitBtn.textContent = prevBtnText;
+    }
   }
+}
+
+function initRequestForm() {
+  const form = document.getElementById('requestForm');
+  if (!form || form.dataset.bound) return;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', postRequest);
 }
 
 function renderRequests() {
@@ -218,7 +291,13 @@ window.showToast = showToast;
 
 // ===== MODAL =====
 function openModal()  { document.getElementById('modal').classList.add('open'); }
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.zIndex = '';
+  }
+}
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
@@ -283,6 +362,7 @@ function startAppListeners() {
 
 window.bootApp = function () {
   startAppListeners();
+  initRequestForm();
   if (typeof window.initGpsButton === 'function') window.initGpsButton();
   if (document.getElementById('requestsList')) renderRequests();
   if (document.getElementById('searchResults')) searchDonors();
@@ -291,7 +371,13 @@ window.bootApp = function () {
 };
 
 Object.assign(window, {
-  quickSearch, searchDonors, postRequest,
+  quickSearch, searchDonors, postRequest, hidePostSuccess,
   showDonorContact, respondToRequest, showSuccessModal, openModal, closeModal, toggleMenu,
   renderRequests,
 });
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRequestForm);
+} else {
+  initRequestForm();
+}

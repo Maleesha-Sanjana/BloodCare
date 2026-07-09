@@ -10,6 +10,20 @@ let donorsCache = [];
 let requestsCache = [];
 let notificationsCache = [];
 let firestoreReady = false;
+const pollTimers = {};
+const pollListeners = { donors: [], requests: [], notifications: [] };
+const POLL_MS = 8000;
+
+function addPollListener(key, fn) {
+  if (typeof fn !== 'function') return;
+  if (!pollListeners[key].includes(fn)) pollListeners[key].push(fn);
+}
+
+function notifyPollListeners(key, data) {
+  pollListeners[key].forEach(fn => {
+    try { fn(data); } catch (err) { console.error(`${key} listener:`, err); }
+  });
+}
 
 const SAMPLE_DONORS = [
   { name: 'Kamal Perera',     age: 28, blood: 'O+',  phone: '+94 71 234 5678', location: 'Colombo',     email: 'kamal@example.com',  donations: 12, date: '2026-01-15' },
@@ -191,10 +205,24 @@ async function upsertDonorProfile(user) {
 
 async function addRequest(req) {
   const db = getDb();
+  if (!db) throw new Error('Database not connected. Please refresh the page.');
+
+  const payload = { ...req };
+  if (payload.lat == null) delete payload.lat;
+  if (payload.lng == null) delete payload.lng;
+
   const ref = await db.collection(COLLECTIONS.REQUESTS).add({
-    ...req,
+    ...payload,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   });
+
+  const newReq = {
+    id: ref.id,
+    ...payload,
+    createdAt: { seconds: Math.floor(Date.now() / 1000) },
+  };
+  requestsCache = sortByCreatedAt(dedupeRequests([...requestsCache, newReq]));
+  refreshRequests().catch(err => console.warn('Requests refresh after add:', err));
   return ref.id;
 }
 
@@ -231,34 +259,65 @@ async function getLeaderboard(limit = 10) {
   return unique.map((d, i) => ({ rank: i + 1, ...d }));
 }
 
-function subscribeDonors(onUpdate) {
+async function refreshDonors() {
   const db = getDb();
   if (!db) return;
-  return db.collection(COLLECTIONS.DONORS)
-    .onSnapshot(snap => {
-      donorsCache = sortDonors(dedupeDonors(snap.docs.map(docToObject)));
-      if (onUpdate) onUpdate(donorsCache);
-    }, err => console.error('Donors listener:', err));
+  try {
+    const snap = await db.collection(COLLECTIONS.DONORS).get();
+    donorsCache = sortDonors(dedupeDonors(snap.docs.map(docToObject)));
+    notifyPollListeners('donors', donorsCache);
+  } catch (err) {
+    console.error('Donors refresh:', err);
+  }
+}
+
+async function refreshRequests() {
+  const db = getDb();
+  if (!db) return;
+  try {
+    const snap = await db.collection(COLLECTIONS.REQUESTS).get();
+    requestsCache = sortByCreatedAt(dedupeRequests(snap.docs.map(docToObject)));
+    notifyPollListeners('requests', requestsCache);
+  } catch (err) {
+    console.error('Requests refresh:', err);
+  }
+}
+
+async function refreshNotifications() {
+  const db = getDb();
+  if (!db) return;
+  try {
+    const snap = await db.collection(COLLECTIONS.NOTIFICATIONS).get();
+    notificationsCache = sortByCreatedAt(dedupeNotifications(snap.docs.map(docToObject))).slice(0, 50);
+    notifyPollListeners('notifications', notificationsCache);
+  } catch (err) {
+    console.error('Notifications refresh:', err);
+  }
+}
+
+function startPolling(key, refreshFn) {
+  if (!pollTimers[key]) {
+    refreshFn();
+    pollTimers[key] = setInterval(refreshFn, POLL_MS);
+  }
+}
+
+function subscribeDonors(onUpdate) {
+  addPollListener('donors', onUpdate);
+  if (onUpdate) onUpdate(donorsCache);
+  startPolling('donors', refreshDonors);
 }
 
 function subscribeRequests(onUpdate) {
-  const db = getDb();
-  if (!db) return;
-  return db.collection(COLLECTIONS.REQUESTS)
-    .onSnapshot(snap => {
-      requestsCache = sortByCreatedAt(dedupeRequests(snap.docs.map(docToObject)));
-      if (onUpdate) onUpdate(requestsCache);
-    }, err => console.error('Requests listener:', err));
+  addPollListener('requests', onUpdate);
+  if (onUpdate) onUpdate(requestsCache);
+  startPolling('requests', refreshRequests);
 }
 
 function subscribeNotifications(onUpdate) {
-  const db = getDb();
-  if (!db) return;
-  return db.collection(COLLECTIONS.NOTIFICATIONS)
-    .onSnapshot(snap => {
-      notificationsCache = sortByCreatedAt(dedupeNotifications(snap.docs.map(docToObject))).slice(0, 50);
-      if (onUpdate) onUpdate(notificationsCache);
-    }, err => console.error('Notifications listener:', err));
+  addPollListener('notifications', onUpdate);
+  if (onUpdate) onUpdate(notificationsCache);
+  startPolling('notifications', refreshNotifications);
 }
 
 async function fetchStats() {
@@ -302,6 +361,7 @@ async function initFirestore(onReady) {
   }
 }
 
+window.refreshRequests = refreshRequests;
 window.getDonors = getDonors;
 window.getRequests = getRequests;
 window.getNotifications = getNotifications;
