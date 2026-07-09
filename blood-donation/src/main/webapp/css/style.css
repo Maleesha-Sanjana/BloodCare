@@ -1186,6 +1186,56 @@ body.notif-open {
   font-size: 0.9rem;
 }
 
+.success-detail-row.muted {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin-top: 0.5rem;
+}
+
+.post-success-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #d5f5e3;
+  border: 2px solid #27ae60;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  animation: slideUp 0.3s ease;
+}
+
+.post-success-alert[hidden] {
+  display: none !important;
+}
+
+.post-success-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.post-success-alert strong {
+  display: block;
+  color: #1e8449;
+  margin-bottom: 0.25rem;
+}
+
+.post-success-alert p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #196f3d;
+}
+
+.post-success-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #1e8449;
+  padding: 0.25rem;
+}
+
 .success-modal-btn {
   margin-top: 0.5rem;
 }

@@ -123,6 +123,7 @@
   }
 
   function resetReqDropdowns() {
+    if ($('rBlood')) $('rBlood').value = '';
     if ($('rBloodValue')) $('rBloodValue').textContent = '-- Select --';
     if ($('rBloodWrap')) $('rBloodWrap').classList.remove('has-value');
     if ($('rBloodDropdown')) setCheckmarks($('rBloodDropdown'), null);
@@ -130,6 +131,7 @@
     if ($('rLocationValue')) $('rLocationValue').textContent = '-- Select District --';
     if ($('rLocationWrap')) $('rLocationWrap').classList.remove('has-value');
     if ($('rLocationOptionsList')) setCheckmarks($('rLocationOptionsList'), null);
+    if ($('rLevel')) $('rLevel').value = '';
     if ($('rLevelValue')) $('rLevelValue').textContent = '-- Select --';
     if ($('rLevelWrap')) $('rLevelWrap').classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
     if ($('rLevelDropdown')) setCheckmarks($('rLevelDropdown'), null);
