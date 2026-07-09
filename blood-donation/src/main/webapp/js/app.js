@@ -136,65 +136,6 @@ function respondToRequest(id) {
   openModal();
 }
 
-// ===== NOTIFICATIONS =====
-let currentFilter = 'all';
-
-function filterNotif(type) {
-  currentFilter = type;
-  document.querySelectorAll('.notif-controls .btn-outline').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  event.target.classList.add('active');
-  renderNotifications();
-}
-
-function renderNotifications() {
-  const all = window.getNotifications();
-  const filtered = currentFilter === 'all' ? all : all.filter(n => n.type === currentFilter);
-  const container = document.getElementById('notifList');
-  if (!container) return;
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔔</div>
-        <p>${t('no_notif')}</p>
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(n => `
-    <div class="notif-item ${n.type} ${n.read ? '' : 'unread'}" id="notif-${n.id}">
-      <span class="notif-icon">${n.icon}</span>
-      <div class="notif-body">
-        <div class="notif-title">${escHtml(n.title)}</div>
-        <div class="notif-msg">${escHtml(n.msg)}</div>
-        <div class="notif-time">${n.time}</div>
-      </div>
-      <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Dismiss">✕</button>
-    </div>
-  `).join('');
-}
-
-async function dismissNotif(id) {
-  try {
-    await window.deleteNotification(id);
-  } catch (err) {
-    console.error('dismissNotif:', err);
-    showToast('Failed to dismiss notification.', 'error');
-  }
-}
-
-async function clearNotifications() {
-  try {
-    await window.clearAllNotifications();
-    showToast(t('toast_cleared'), 'info');
-  } catch (err) {
-    console.error('clearNotifications:', err);
-    showToast('Failed to clear notifications.', 'error');
-  }
-}
-
 // ===== TOAST =====
 let toastTimer;
 function showToast(msg, type = 'success') {
@@ -227,8 +168,8 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 function highlightNav() {
   const loggedIn = window.auth && window.auth.currentUser;
   const sections = loggedIn
-    ? ['home', 'donorWelcome', 'search', 'requests', 'notifications']
-    : ['home', 'search', 'requests', 'notifications'];
+    ? ['home', 'donorWelcome', 'search', 'requests']
+    : ['home', 'search', 'requests'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
@@ -262,18 +203,23 @@ function startAppListeners() {
     renderRequests();
     updateStats();
   });
-  window.subscribeNotifications(renderNotifications);
+  if (typeof window.subscribeNotifications === 'function') {
+    window.subscribeNotifications(() => {
+      if (typeof window.renderNotifications === 'function') window.renderNotifications();
+      if (typeof window.updateNotifBadge === 'function') window.updateNotifBadge();
+    });
+  }
 }
 
 window.bootApp = function () {
   startAppListeners();
-  renderRequests();
-  renderNotifications();
-  searchDonors();
+  if (document.getElementById('requestsList')) renderRequests();
+  if (document.getElementById('searchResults')) searchDonors();
+  if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
 };
 
 Object.assign(window, {
-  quickSearch, searchDonors, postRequest, filterNotif, dismissNotif, clearNotifications,
+  quickSearch, searchDonors, postRequest,
   showDonorContact, respondToRequest, showToast, openModal, closeModal, toggleMenu,
-  renderRequests, renderNotifications,
+  renderRequests,
 });

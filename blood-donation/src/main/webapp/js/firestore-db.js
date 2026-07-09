@@ -39,6 +39,58 @@ function docToObject(doc) {
   return { id: doc.id, ...doc.data() };
 }
 
+function donorKey(d) {
+  if (d.uid) return `uid:${d.uid}`;
+  const phone = (d.phone || '').replace(/\D/g, '');
+  if (phone) return `phone:${phone}`;
+  return `name:${d.name}|${d.blood}|${d.location}`;
+}
+
+function requestKey(r) {
+  return `${r.hospital}|${r.blood}|${r.date}|${r.time}|${r.location}`;
+}
+
+function dedupeByKey(items, keyFn) {
+  const seen = new Map();
+  for (const item of items) {
+    const key = keyFn(item);
+    const existing = seen.get(key);
+    if (!existing) {
+      seen.set(key, item);
+      continue;
+    }
+    const preferNew = item.id?.startsWith('seed-') && !existing.id?.startsWith('seed-');
+    if (preferNew || (item.donations || 0) > (existing.donations || 0)) {
+      seen.set(key, item);
+    }
+  }
+  return [...seen.values()];
+}
+
+function dedupeDonors(donors) { return dedupeByKey(donors, donorKey); }
+function dedupeRequests(requests) { return dedupeByKey(requests, requestKey); }
+
+function notificationKey(n) {
+  return `${n.type}|${n.title}|${n.msg}`;
+}
+
+function dedupeNotifications(items) { return dedupeByKey(items, notificationKey); }
+
+function seedDonorId(donor) {
+  const phone = (donor.phone || '').replace(/\D/g, '');
+  return phone ? `seed-donor-${phone}` : `seed-donor-${donor.name}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+}
+
+function seedRequestId(req) {
+  const slug = `${req.hospital}-${req.blood}-${req.date}-${req.time}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `seed-req-${slug}`;
+}
+
+function seedNotifId(notif) {
+  const slug = `${notif.type}-${notif.title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `seed-notif-${slug}`;
+}
+
 function sortDonors(donors) {
   return donors.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
@@ -69,13 +121,19 @@ async function seedFirestoreIfEmpty() {
   const now = firebase.firestore.FieldValue.serverTimestamp();
 
   SAMPLE_DONORS.forEach(donor => {
-    batch.set(db.collection(COLLECTIONS.DONORS).doc(), { ...donor, createdAt: now });
+    batch.set(db.collection(COLLECTIONS.DONORS).doc(seedDonorId(donor)), {
+      ...donor, seed: true, createdAt: now,
+    }, { merge: true });
   });
   SAMPLE_REQUESTS.forEach(req => {
-    batch.set(db.collection(COLLECTIONS.REQUESTS).doc(), { ...req, createdAt: now });
+    batch.set(db.collection(COLLECTIONS.REQUESTS).doc(seedRequestId(req)), {
+      ...req, seed: true, createdAt: now,
+    }, { merge: true });
   });
   SAMPLE_NOTIFICATIONS.forEach(notif => {
-    batch.set(db.collection(COLLECTIONS.NOTIFICATIONS).doc(), { ...notif, createdAt: now });
+    batch.set(db.collection(COLLECTIONS.NOTIFICATIONS).doc(seedNotifId(notif)), {
+      ...notif, seed: true, createdAt: now,
+    }, { merge: true });
   });
   batch.set(db.collection(COLLECTIONS.META).doc('seeded'), {
     seeded: true,
@@ -96,9 +154,17 @@ async function loadAllData() {
     db.collection(COLLECTIONS.NOTIFICATIONS).get(),
   ]);
 
-  donorsCache = sortDonors(donorsSnap.docs.map(docToObject));
-  requestsCache = sortByCreatedAt(requestsSnap.docs.map(docToObject));
-  notificationsCache = sortByCreatedAt(notifsSnap.docs.map(docToObject)).slice(0, 50);
+  donorsCache = sortDonors(dedupeDonors(donorsSnap.docs.map(docToObject)));
+  requestsCache = sortByCreatedAt(dedupeRequests(requestsSnap.docs.map(docToObject)));
+  notificationsCache = sortByCreatedAt(dedupeNotifications(notifsSnap.docs.map(docToObject))).slice(0, 50);
+}
+
+async function reloadNotifications() {
+  const db = getDb();
+  if (!db) return notificationsCache;
+  const snap = await db.collection(COLLECTIONS.NOTIFICATIONS).get();
+  notificationsCache = sortByCreatedAt(dedupeNotifications(snap.docs.map(docToObject))).slice(0, 50);
+  return notificationsCache;
 }
 
 async function upsertDonorProfile(user) {
@@ -157,13 +223,12 @@ async function getLeaderboard(limit = 10) {
   const db = getDb();
   const snap = await db.collection(COLLECTIONS.DONORS)
     .orderBy('donations', 'desc')
-    .limit(limit)
+    .limit(50)
     .get();
-  return snap.docs.map((doc, i) => ({
-    rank: i + 1,
-    id: doc.id,
-    ...doc.data(),
-  }));
+  const unique = dedupeDonors(snap.docs.map(docToObject))
+    .sort((a, b) => (b.donations || 0) - (a.donations || 0))
+    .slice(0, limit);
+  return unique.map((d, i) => ({ rank: i + 1, ...d }));
 }
 
 function subscribeDonors(onUpdate) {
@@ -171,7 +236,7 @@ function subscribeDonors(onUpdate) {
   if (!db) return;
   return db.collection(COLLECTIONS.DONORS)
     .onSnapshot(snap => {
-      donorsCache = sortDonors(snap.docs.map(docToObject));
+      donorsCache = sortDonors(dedupeDonors(snap.docs.map(docToObject)));
       if (onUpdate) onUpdate(donorsCache);
     }, err => console.error('Donors listener:', err));
 }
@@ -181,7 +246,7 @@ function subscribeRequests(onUpdate) {
   if (!db) return;
   return db.collection(COLLECTIONS.REQUESTS)
     .onSnapshot(snap => {
-      requestsCache = sortByCreatedAt(snap.docs.map(docToObject));
+      requestsCache = sortByCreatedAt(dedupeRequests(snap.docs.map(docToObject)));
       if (onUpdate) onUpdate(requestsCache);
     }, err => console.error('Requests listener:', err));
 }
@@ -191,7 +256,7 @@ function subscribeNotifications(onUpdate) {
   if (!db) return;
   return db.collection(COLLECTIONS.NOTIFICATIONS)
     .onSnapshot(snap => {
-      notificationsCache = sortByCreatedAt(snap.docs.map(docToObject)).slice(0, 50);
+      notificationsCache = sortByCreatedAt(dedupeNotifications(snap.docs.map(docToObject))).slice(0, 50);
       if (onUpdate) onUpdate(notificationsCache);
     }, err => console.error('Notifications listener:', err));
 }
@@ -205,7 +270,9 @@ async function fetchStats() {
     db.collection(COLLECTIONS.REQUESTS).get(),
   ]);
 
-  return { donors: donorsSnap.size, requests: requestsSnap.size };
+  const donors = dedupeDonors(donorsSnap.docs.map(docToObject));
+  const requests = dedupeRequests(requestsSnap.docs.map(docToObject));
+  return { donors: donors.length, requests: requests.length };
 }
 
 async function initFirestore(onReady) {
@@ -248,6 +315,7 @@ window.addNotification = addNotification;
 window.deleteNotification = deleteNotification;
 window.clearAllNotifications = clearAllNotifications;
 window.getLeaderboard = getLeaderboard;
+window.reloadNotifications = reloadNotifications;
 window.upsertDonorProfile = upsertDonorProfile;
 
 // ===== HOME STATS (load + count-up animation) =====

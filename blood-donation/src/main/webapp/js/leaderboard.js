@@ -61,7 +61,7 @@ async function renderLeaderboard() {
 
 function startLeaderboardListener() {
   window.subscribeDonors(donors => {
-    const ranked = [...donors]
+    const ranked = dedupeDonors(donors)
       .sort((a, b) => (b.donations || 0) - (a.donations || 0))
       .slice(0, 10)
       .map((d, i) => ({ rank: i + 1, ...d }));

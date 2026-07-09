@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
- * Seed BloodCare Firestore with dummy data (uses client SDK + open rules).
- * Run: npm run seed   (from blood-donation/)
+ * Seed BloodCare Firestore with dummy test data (stable IDs — no duplicates).
+ *
+ *   npm run seed        — seed only if empty
+ *   npm run seed:reset  — dedupe + upsert canonical seed records
  */
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
@@ -17,9 +19,14 @@ import {
   query,
   limit,
 } from 'firebase/firestore';
+import {
+  donorDocId,
+  requestDocId,
+  notificationDocId,
+} from './firestore-utils.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const FORCE = process.argv.includes('--force');
+const RESET = process.argv.includes('--reset');
 
 const firebaseConfig = {
   apiKey:            'AIzaSyBMNkoovZcsUWR6lJmOBQS-DNUc1g7ZOG0',
@@ -37,13 +44,12 @@ const db = getFirestore(app);
 
 async function hasData() {
   const donors = await getDocs(query(collection(db, 'donors'), limit(1)));
-  const requests = await getDocs(query(collection(db, 'requests'), limit(1)));
-  return !donors.empty && !requests.empty;
+  return !donors.empty;
 }
 
 async function seed() {
-  if (!FORCE && await hasData()) {
-    console.log('Already seeded. Use --force to add more dummy data.');
+  if (!RESET && await hasData()) {
+    console.log('Already seeded. Run: npm run dedupe  or  npm run seed:reset');
     process.exit(0);
   }
 
@@ -51,30 +57,43 @@ async function seed() {
   const now = serverTimestamp();
 
   data.donors.forEach(donor => {
-    batch.set(doc(collection(db, 'donors')), { ...donor, createdAt: now });
+    batch.set(doc(db, 'donors', donorDocId(donor)), {
+      ...donor,
+      seed: true,
+      createdAt: now,
+    }, { merge: true });
   });
 
   data.requests.forEach(req => {
-    batch.set(doc(collection(db, 'requests')), { ...req, createdAt: now });
+    batch.set(doc(db, 'requests', requestDocId(req)), {
+      ...req,
+      seed: true,
+      createdAt: now,
+    }, { merge: true });
   });
 
   data.notifications.forEach(notif => {
-    batch.set(doc(collection(db, 'notifications')), { ...notif, createdAt: now });
+    batch.set(doc(db, 'notifications', notificationDocId(notif)), {
+      ...notif,
+      seed: true,
+      createdAt: now,
+    }, { merge: true });
   });
 
   batch.set(doc(db, 'meta', 'seeded'), {
     seeded: true,
     seededAt: now,
     source: 'cli',
-  });
+    version: 3,
+  }, { merge: true });
 
   await batch.commit();
 
-  console.log(`Seeded bloodcare-5a516:`);
-  console.log(`  ${data.donors.length} donors`);
-  console.log(`  ${data.requests.length} requests`);
-  console.log(`  ${data.notifications.length} notifications`);
-  console.log('\nRefresh the app — home stats should show 8 donors, 3 requests.');
+  console.log(`\n✅ Seeded bloodcare-5a516 (stable IDs — safe to re-run):`);
+  console.log(`   ${data.donors.length} donors`);
+  console.log(`   ${data.requests.length} requests`);
+  console.log(`   ${data.notifications.length} notifications`);
+  console.log('\n   Refresh http://localhost:5500/index.html');
 }
 
 seed().catch(err => {
