@@ -17,13 +17,14 @@
     </div>
     <ul class="nav-links">
       <li><a href="#home" data-i18n="nav_home">Home</a></li>
+      <li><a href="#requestMapSection" data-i18n="nav_map">Blood Map</a></li>
+      <li><a href="#search" data-i18n="nav_search">Find Donors</a></li>
+      <li><a href="#requests" data-i18n="nav_requests">Blood Requests</a></li>
       <li><a href="leaderboard.html" data-i18n="nav_leaderboard">Leaderboard</a></li>
-      <li><a href="#search" data-i18n="nav_search">Find Donor</a></li>
-      <li><a href="#requests" data-i18n="nav_requests">Requests</a></li>
     </ul>
     <div class="nav-right">
       <div class="nav-auth">
-        <button id="navSignIn" class="btn btn-nav-auth" onclick="openAuthModal('signin')" data-i18n="auth_signin">Sign In</button>
+        <a href="#requests" id="navRegisterRecipient" class="btn btn-nav-recipient" onclick="handleRegisterRecipientClick(event)" data-i18n="nav_register_recipient">Register as Recipient</a>
         <div id="navUserInfo" class="nav-user-info" style="display:none">
           <img id="navUserAvatar" class="nav-user-avatar" alt="" />
           <a href="profile.html" id="navUserName" class="nav-user-name nav-user-link"></a>
@@ -75,7 +76,7 @@
   </section>
 
   <!-- BLOOD GROUP QUICK SEARCH -->
-  <section class="quick-search">
+  <section class="quick-search" id="quickSearch">
     <h2 data-i18n="qs_title">Quick Blood Search</h2>
     <div class="blood-groups">
       <button class="bg-btn" onclick="quickSearch('A+')">A+</button>
@@ -504,15 +505,15 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/i18n.js?v=20"></script>
-  <script src="js/dropdowns.js?v=20"></script>
-  <script src="js/firebase-config.js?v=20"></script>
-  <script src="js/firestore-db.js?v=20"></script>
-  <script src="js/location-utils.js?v=20"></script>
-  <script src="js/gps.js?v=20"></script>
-  <script src="js/notifications.js?v=20"></script>
-  <script src="js/auth.js?v=20"></script>
-  <script src="js/app.js?v=20"></script>
-  <script src="js/map.js?v=20"></script>
+  <script src="js/i18n.js?v=22"></script>
+  <script src="js/dropdowns.js?v=22"></script>
+  <script src="js/firebase-config.js?v=22"></script>
+  <script src="js/firestore-db.js?v=22"></script>
+  <script src="js/location-utils.js?v=22"></script>
+  <script src="js/gps.js?v=22"></script>
+  <script src="js/notifications.js?v=22"></script>
+  <script src="js/auth.js?v=22"></script>
+  <script src="js/app.js?v=22"></script>
+  <script src="js/map.js?v=22"></script>
 </body>
 </html>

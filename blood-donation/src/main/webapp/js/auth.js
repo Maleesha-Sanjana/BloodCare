@@ -55,6 +55,26 @@ function switchAuthTab(mode) {
   clearAuthErrors();
 }
 
+function handleRegisterRecipientClick(e) {
+  if (e) e.preventDefault();
+  document.querySelector('.nav-links')?.classList.remove('open');
+
+  const onHome = location.pathname.endsWith('index.html')
+    || location.pathname === '/'
+    || location.pathname.endsWith('/');
+
+  if (!onHome) {
+    location.href = 'index.html#requests';
+    return;
+  }
+
+  const section = document.getElementById('requests');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => document.getElementById('rHospital')?.focus(), 500);
+  }
+}
+
 function handleRegisterClick(e) {
   if (!currentUser) {
     e.preventDefault();
@@ -84,14 +104,14 @@ function renderDonorWelcome(user) {
 
 function updateAuthUI(user) {
   currentUser = user;
-  const signInBtn      = document.getElementById('navSignIn');
+  const recipientBtn   = document.getElementById('navRegisterRecipient');
   const userInfo       = document.getElementById('navUserInfo');
   const welcomeSection = document.getElementById('donorWelcome');
   const heroRegister   = document.getElementById('heroRegisterBtn');
   const isProfilePage  = location.pathname.endsWith('profile.html');
 
   if (user) {
-    if (signInBtn) signInBtn.style.display = 'none';
+    if (recipientBtn) recipientBtn.style.display = 'none';
     if (userInfo) {
       userInfo.style.display = 'flex';
       const name = user.displayName || user.email.split('@')[0];
@@ -110,7 +130,7 @@ function updateAuthUI(user) {
       renderDonorWelcome(user);
     }
   } else {
-    if (signInBtn) signInBtn.style.display = 'inline-flex';
+    if (recipientBtn) recipientBtn.style.display = 'inline-flex';
     if (userInfo) userInfo.style.display = 'none';
     if (welcomeSection) welcomeSection.style.display = 'none';
     if (heroRegister) heroRegister.style.display = '';
@@ -265,6 +285,13 @@ auth.onAuthStateChanged(user => {
 
 handleGoogleRedirectResult();
 
+function initRecipientHashScroll() {
+  if (location.hash !== '#requests') return;
+  setTimeout(() => document.getElementById('rHospital')?.focus(), 800);
+}
+
+document.addEventListener('DOMContentLoaded', initRecipientHashScroll);
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeAuthModal();
 });
@@ -277,4 +304,5 @@ window.signInWithEmail = signInWithEmail;
 window.signInWithGoogle = signInWithGoogle;
 window.signOut = signOut;
 window.handleRegisterClick = handleRegisterClick;
+window.handleRegisterRecipientClick = handleRegisterRecipientClick;
 window.toggleMenu = toggleMenu;

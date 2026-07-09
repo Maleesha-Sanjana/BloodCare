@@ -316,8 +316,8 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 function highlightNav() {
   const loggedIn = window.auth && window.auth.currentUser;
   const sections = loggedIn
-    ? ['home', 'donorWelcome', 'requestMapSection', 'search', 'requests']
-    : ['home', 'requestMapSection', 'search', 'requests'];
+    ? ['home', 'quickSearch', 'donorWelcome', 'requestMapSection', 'search', 'requests']
+    : ['home', 'quickSearch', 'requestMapSection', 'search', 'requests'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
