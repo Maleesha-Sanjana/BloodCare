@@ -19,7 +19,8 @@
       <li><a href="#home" data-i18n="nav_home">Home</a></li>
       <li><a href="#requestMapSection" data-i18n="nav_map">Blood Map</a></li>
       <li><a href="#search" data-i18n="nav_search">Find Donors</a></li>
-      <li><a href="#requests" data-i18n="nav_requests">Blood Requests</a></li>
+      <li><a href="#requests" data-i18n="nav_donate" id="navDonateLink" style="display:none">Donate</a></li>
+      <li><a href="#requests" data-i18n="nav_requests" id="navRequestsLink">Blood Requests</a></li>
       <li><a href="#leaderboard" data-i18n="nav_leaderboard">Leaderboard</a></li>
     </ul>
     <div class="nav-right">
@@ -224,15 +225,143 @@
     </div>
   </section>
 
-  <!-- DONATION REQUESTS -->
+  <!-- DONATION REQUESTS / DONATION FORM -->
   <section class="section" id="requests">
     <div class="section-header">
-      <h2 data-i18n="req_title">Blood Donation Requests</h2>
-      <p data-i18n="req_sub">Hospitals can post urgent blood requests here</p>
+      <h2 id="requestsSectionTitle" data-i18n="req_title">Blood Donation Requests</h2>
+      <p id="requestsSectionSub" data-i18n="req_sub">Hospitals can post urgent blood requests here</p>
     </div>
     <div class="two-col">
-      <!-- Post Request Form -->
-      <div class="form-card">
+      <!-- Donor Donation Form (shown for registered donors) -->
+      <div class="form-card" id="donorFormCard" style="display:none">
+        <h3 data-i18n="don_form_title">Donation Form</h3>
+        <form id="donationForm" novalidate>
+          <div id="donSuccessAlert" class="post-success-alert" hidden>
+            <span class="post-success-icon">✅</span>
+            <div>
+              <strong id="donSuccessTitle">Donation registered!</strong>
+              <p id="donSuccessMsg">Your profile is updated on the leaderboard.</p>
+            </div>
+            <button type="button" class="post-success-close" onclick="hideDonSuccess()" aria-label="Close">✕</button>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_name">Full Name</label>
+            <input type="text" id="dName" placeholder="Your full name" required />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="form_blood">Blood Group</label>
+            <div class="custom-select-wrap" id="dBloodWrap">
+              <button type="button" class="custom-select-trigger">
+                <span class="cs-icon">🩸</span>
+                <span class="cs-value" id="dBloodValue">-- Select --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="dBloodDropdown">
+                <div class="cs-option" data-value="A+" ><span class="cs-check"></span><span class="cs-badge">A+</span></div>
+                <div class="cs-option" data-value="A-" ><span class="cs-check"></span><span class="cs-badge">A−</span></div>
+                <div class="cs-option" data-value="B+" ><span class="cs-check"></span><span class="cs-badge">B+</span></div>
+                <div class="cs-option" data-value="B-" ><span class="cs-check"></span><span class="cs-badge">B−</span></div>
+                <div class="cs-option" data-value="AB+"><span class="cs-check"></span><span class="cs-badge">AB+</span></div>
+                <div class="cs-option" data-value="AB-"><span class="cs-check"></span><span class="cs-badge">AB−</span></div>
+                <div class="cs-option" data-value="O+" ><span class="cs-check"></span><span class="cs-badge">O+</span></div>
+                <div class="cs-option" data-value="O-" ><span class="cs-check"></span><span class="cs-badge">O−</span></div>
+              </div>
+            </div>
+            <select id="dBlood" style="display:none" required>
+              <option value="">-- Select --</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="form_location">District</label>
+            <div class="custom-select-wrap" id="dLocationWrap">
+              <button type="button" class="custom-select-trigger">
+                <span class="cs-icon">📍</span>
+                <span class="cs-value" id="dLocationValue">-- Select District --</span>
+                <span class="cs-arrow">▾</span>
+              </button>
+              <div class="custom-select-dropdown" id="dLocationDropdown">
+                <div class="cs-search-wrap">
+                  <input type="text" class="cs-search" placeholder="Search district…" />
+                </div>
+                <div class="cs-options-list" id="dLocationOptionsList">
+                  <div class="cs-option" data-value="Colombo"><span class="cs-check"></span>Colombo</div>
+                  <div class="cs-option" data-value="Gampaha"><span class="cs-check"></span>Gampaha</div>
+                  <div class="cs-option" data-value="Kalutara"><span class="cs-check"></span>Kalutara</div>
+                  <div class="cs-option" data-value="Kandy"><span class="cs-check"></span>Kandy</div>
+                  <div class="cs-option" data-value="Matale"><span class="cs-check"></span>Matale</div>
+                  <div class="cs-option" data-value="Nuwara Eliya"><span class="cs-check"></span>Nuwara Eliya</div>
+                  <div class="cs-option" data-value="Galle"><span class="cs-check"></span>Galle</div>
+                  <div class="cs-option" data-value="Matara"><span class="cs-check"></span>Matara</div>
+                  <div class="cs-option" data-value="Hambantota"><span class="cs-check"></span>Hambantota</div>
+                  <div class="cs-option" data-value="Jaffna"><span class="cs-check"></span>Jaffna</div>
+                  <div class="cs-option" data-value="Kilinochchi"><span class="cs-check"></span>Kilinochchi</div>
+                  <div class="cs-option" data-value="Mannar"><span class="cs-check"></span>Mannar</div>
+                  <div class="cs-option" data-value="Vavuniya"><span class="cs-check"></span>Vavuniya</div>
+                  <div class="cs-option" data-value="Mullaitivu"><span class="cs-check"></span>Mullaitivu</div>
+                  <div class="cs-option" data-value="Batticaloa"><span class="cs-check"></span>Batticaloa</div>
+                  <div class="cs-option" data-value="Ampara"><span class="cs-check"></span>Ampara</div>
+                  <div class="cs-option" data-value="Trincomalee"><span class="cs-check"></span>Trincomalee</div>
+                  <div class="cs-option" data-value="Kurunegala"><span class="cs-check"></span>Kurunegala</div>
+                  <div class="cs-option" data-value="Puttalam"><span class="cs-check"></span>Puttalam</div>
+                  <div class="cs-option" data-value="Anuradhapura"><span class="cs-check"></span>Anuradhapura</div>
+                  <div class="cs-option" data-value="Polonnaruwa"><span class="cs-check"></span>Polonnaruwa</div>
+                  <div class="cs-option" data-value="Badulla"><span class="cs-check"></span>Badulla</div>
+                  <div class="cs-option" data-value="Monaragala"><span class="cs-check"></span>Monaragala</div>
+                  <div class="cs-option" data-value="Ratnapura"><span class="cs-check"></span>Ratnapura</div>
+                  <div class="cs-option" data-value="Kegalle"><span class="cs-check"></span>Kegalle</div>
+                </div>
+              </div>
+            </div>
+            <select id="dLocation" style="display:none" required>
+              <option value="">-- Select District --</option>
+              <option>Colombo</option><option>Gampaha</option><option>Kalutara</option>
+              <option>Kandy</option><option>Matale</option><option>Nuwara Eliya</option>
+              <option>Galle</option><option>Matara</option><option>Hambantota</option>
+              <option>Jaffna</option><option>Kilinochchi</option><option>Mannar</option>
+              <option>Vavuniya</option><option>Mullaitivu</option><option>Batticaloa</option>
+              <option>Ampara</option><option>Trincomalee</option><option>Kurunegala</option>
+              <option>Puttalam</option><option>Anuradhapura</option><option>Polonnaruwa</option>
+              <option>Badulla</option><option>Monaragala</option><option>Ratnapura</option>
+              <option>Kegalle</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_age">Age</label>
+            <input type="number" id="dAge" min="18" max="65" placeholder="18–65" required />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_phone">Phone Number</label>
+            <input type="tel" id="dPhone" placeholder="+94 XX XXX XXXX" required />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_units">Units Donated</label>
+            <input type="number" id="dUnits" min="1" max="5" value="1" required />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_date">Donation Date</label>
+            <input type="date" id="dDate" required />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="don_notes">Notes (optional)</label>
+            <textarea id="dNotes" rows="2" placeholder="Any additional details…"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary full-width" data-i18n="don_submit">Register Donation</button>
+        </form>
+      </div>
+
+      <!-- Post Request Form (shown for recipients / guests) -->
+      <div class="form-card" id="recipientFormCard">
         <h3 data-i18n="req_post">Post a Request</h3>
         <form id="requestForm" novalidate>
           <div id="postSuccessAlert" class="post-success-alert" hidden>
@@ -514,16 +643,16 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/i18n.js?v=25"></script>
-  <script src="js/dropdowns.js?v=25"></script>
-  <script src="js/firebase-config.js?v=25"></script>
-  <script src="js/firestore-db.js?v=25"></script>
-  <script src="js/location-utils.js?v=25"></script>
-  <script src="js/gps.js?v=25"></script>
-  <script src="js/notifications.js?v=25"></script>
-  <script src="js/auth.js?v=25"></script>
-  <script src="js/app.js?v=25"></script>
-  <script src="js/map.js?v=25"></script>
-  <script src="js/leaderboard.js?v=25"></script>
+  <script src="js/i18n.js?v=29"></script>
+  <script src="js/dropdowns.js?v=29"></script>
+  <script src="js/firebase-config.js?v=29"></script>
+  <script src="js/firestore-db.js?v=29"></script>
+  <script src="js/location-utils.js?v=29"></script>
+  <script src="js/gps.js?v=29"></script>
+  <script src="js/notifications.js?v=29"></script>
+  <script src="js/auth.js?v=29"></script>
+  <script src="js/app.js?v=29"></script>
+  <script src="js/map.js?v=29"></script>
+  <script src="js/leaderboard.js?v=29"></script>
 </body>
 </html>

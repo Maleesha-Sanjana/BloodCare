@@ -56,6 +56,26 @@
     if (search) { search.value = ''; filterLocationOptions(''); }
   }
 
+  function pickDonorBlood(el, value, label) {
+    $('dBlood').value = value;
+    $('dBloodValue').textContent = label;
+    var wrap = $('dBloodWrap');
+    wrap.classList.toggle('has-value', value !== '');
+    setCheckmarks($('dBloodDropdown'), el);
+    wrap.classList.remove('open');
+  }
+
+  function pickDonorLocation(el, value) {
+    $('dLocation').value = value;
+    $('dLocationValue').textContent = value;
+    var wrap = $('dLocationWrap');
+    wrap.classList.toggle('has-value', value !== '');
+    setCheckmarks($('dLocationOptionsList'), el);
+    wrap.classList.remove('open');
+    var search = document.querySelector('#dLocationDropdown .cs-search');
+    if (search) { search.value = ''; filterDonorLocationOptions(''); }
+  }
+
   function pickReqBlood(el, value, label) {
     $('rBlood').value = value;
     $('rBloodValue').textContent = label;
@@ -97,6 +117,8 @@
   function filterLocationOptions(query) { filterOptions('locationOptionsList', query); }
   function filterReqLocationOptions(query) { filterOptions('rLocationOptionsList', query); }
 
+  function filterDonorLocationOptions(query) { filterOptions('dLocationOptionsList', query); }
+
   function onOptionClick(option) {
     var wrap = option.closest('.custom-select-wrap');
     if (!wrap) return;
@@ -109,6 +131,12 @@
       case 'locationWrap':
         pickLocation(option, value, value || 'All Districts');
         break;
+      case 'dBloodWrap':
+        pickDonorBlood(option, value, optionLabel(option));
+        break;
+      case 'dLocationWrap':
+        pickDonorLocation(option, value);
+        break;
       case 'rBloodWrap':
         pickReqBlood(option, value, optionLabel(option));
         break;
@@ -120,6 +148,17 @@
         pickReqLevel(option, value, labels[value] || value);
         break;
     }
+  }
+
+  function resetDonorDropdowns() {
+    if ($('dBlood')) $('dBlood').value = '';
+    if ($('dBloodValue')) $('dBloodValue').textContent = '-- Select --';
+    if ($('dBloodWrap')) $('dBloodWrap').classList.remove('has-value');
+    if ($('dBloodDropdown')) setCheckmarks($('dBloodDropdown'), null);
+    if ($('dLocation')) $('dLocation').value = '';
+    if ($('dLocationValue')) $('dLocationValue').textContent = '-- Select District --';
+    if ($('dLocationWrap')) $('dLocationWrap').classList.remove('has-value');
+    if ($('dLocationOptionsList')) setCheckmarks($('dLocationOptionsList'), null);
   }
 
   function resetReqDropdowns() {
@@ -158,6 +197,9 @@
     var locSearch = document.querySelector('#locationDropdown .cs-search');
     if (locSearch) locSearch.addEventListener('input', function () { filterLocationOptions(locSearch.value); });
 
+    var donLocSearch = document.querySelector('#dLocationDropdown .cs-search');
+    if (donLocSearch) donLocSearch.addEventListener('input', function () { filterDonorLocationOptions(donLocSearch.value); });
+
     var reqLocSearch = document.querySelector('#rLocationDropdown .cs-search');
     if (reqLocSearch) reqLocSearch.addEventListener('input', function () { filterReqLocationOptions(reqLocSearch.value); });
 
@@ -177,6 +219,8 @@
   }
 
   window.resetReqDropdowns = resetReqDropdowns;
+  window.resetDonorDropdowns = resetDonorDropdowns;
   window.filterLocationOptions = filterLocationOptions;
   window.filterReqLocationOptions = filterReqLocationOptions;
+  window.filterDonorLocationOptions = filterDonorLocationOptions;
 })();

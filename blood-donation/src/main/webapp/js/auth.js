@@ -82,7 +82,19 @@ function scrollToRequests() {
   const section = document.getElementById('requests');
   if (section) {
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => document.getElementById('rHospital')?.focus(), 500);
+    setTimeout(() => {
+      const isDonor = userRole === 'donor';
+      const focusId = isDonor ? 'dName' : 'rHospital';
+      document.getElementById(focusId)?.focus();
+    }, 500);
+  }
+}
+
+function scrollToDonationForm() {
+  const section = document.getElementById('requests');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => document.getElementById('dName')?.focus(), 500);
   }
 }
 
@@ -106,7 +118,7 @@ function handleAuthSuccessRedirect() {
     }
     return;
   }
-  scrollToDonorWelcome();
+  scrollToDonationForm();
 }
 
 function requireAuthForAction(intent) {
@@ -224,7 +236,7 @@ async function signUpWithEmail(e) {
       scrollToRequests();
     } else {
       showToast(t('auth_toast_verify'), 'info');
-      scrollToDonorWelcome();
+      scrollToDonationForm();
     }
   } catch (err) {
     showAuthError(authErrorMessage(err.code));
@@ -244,7 +256,8 @@ async function signInWithEmail(e) {
   btn.textContent = t('auth_loading');
 
   try {
-    await auth.signInWithEmailAndPassword(email, password);
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    userRole = await loadUserRole(cred.user);
     closeAuthModal();
     showToast(isRecipientIntent() ? t('auth_toast_recipient') : t('auth_toast_signin'), 'success');
     handleAuthSuccessRedirect();
@@ -267,10 +280,16 @@ function setGoogleLoading(loading) {
   });
 }
 
-function onGoogleSignInSuccess() {
-  closeAuthModal();
-  showToast(t('auth_toast_google'), 'success');
-  handleAuthSuccessRedirect();
+function onGoogleSignInSuccess(user) {
+  loadUserRole(user || auth.currentUser).then(role => {
+    userRole = role;
+    if (typeof window.updateFormsByRole === 'function') {
+      window.updateFormsByRole(userRole, true);
+    }
+    closeAuthModal();
+    showToast(t('auth_toast_google'), 'success');
+    handleAuthSuccessRedirect();
+  });
 }
 
 async function signInWithGoogle() {
@@ -282,7 +301,7 @@ async function signInWithGoogle() {
 
   try {
     const result = await auth.signInWithPopup(provider);
-    if (result.user) onGoogleSignInSuccess();
+    if (result.user) onGoogleSignInSuccess(result.user);
   } catch (err) {
     console.error('Google sign-in:', err.code, err.message);
 
@@ -307,7 +326,7 @@ function handleGoogleRedirectResult() {
   setGoogleLoading(false);
   auth.getRedirectResult()
     .then((result) => {
-      if (result && result.user) onGoogleSignInSuccess();
+      if (result && result.user) onGoogleSignInSuccess(result.user);
     })
     .catch((err) => {
       if (err && err.code) {
@@ -355,14 +374,42 @@ function initAuthFromSession() {
   }
 }
 
-auth.onAuthStateChanged(user => {
-  updateAuthUI(user);
-  if (user && typeof window.upsertUserProfile === 'function') {
-    const role = isRecipientIntent() ? 'recipient' : 'donor';
-    window.upsertUserProfile(user, role)
-      .then(role => { userRole = role || 'donor'; updateAuthUI(user); })
-      .catch(err => console.error('User profile:', err));
+function roleFromIntent() {
+  if (authIntent === 'recipient' || authIntent === 'postRequest') return 'recipient';
+  return 'donor';
+}
+
+async function loadUserRole(user) {
+  if (!user) return 'donor';
+  if (typeof window.fetchUserRole === 'function') {
+    return window.fetchUserRole(user.uid);
   }
+  return 'donor';
+}
+
+auth.onAuthStateChanged(async user => {
+  updateAuthUI(user);
+
+  if (user) {
+    try {
+      if (typeof window.upsertUserProfile === 'function') {
+        await window.upsertUserProfile(user, roleFromIntent());
+      }
+      userRole = await loadUserRole(user);
+      updateAuthUI(user);
+      if (typeof window.updateFormsByRole === 'function') {
+        window.updateFormsByRole(userRole, true);
+      }
+    } catch (err) {
+      console.error('User profile:', err);
+    }
+  } else {
+    userRole = 'donor';
+    if (typeof window.updateFormsByRole === 'function') {
+      window.updateFormsByRole('donor', false);
+    }
+  }
+
   if (typeof window.reloadNotifications === 'function') {
     window.reloadNotifications()
       .then(() => {

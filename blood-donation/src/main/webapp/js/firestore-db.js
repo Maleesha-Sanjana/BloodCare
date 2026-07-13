@@ -2,6 +2,7 @@
 const COLLECTIONS = {
   DONORS: 'donors',
   REQUESTS: 'requests',
+  DONATIONS: 'donations',
   NOTIFICATIONS: 'notifications',
   META: 'meta',
 };
@@ -189,12 +190,14 @@ async function upsertUserProfile(user, role = 'donor') {
   const snap = await ref.get();
 
   if (snap.exists) {
-    const existingRole = snap.data().role || 'donor';
-    if (role === 'recipient' && existingRole === 'donor') {
-      await ref.set({ role: 'recipient' }, { merge: true });
-      return 'recipient';
+    const data = snap.data();
+    const updates = {};
+    if (!data.name) updates.name = user.displayName || user.email.split('@')[0];
+    if (!data.email && user.email) updates.email = user.email;
+    if (Object.keys(updates).length) {
+      await ref.set(updates, { merge: true });
     }
-    return existingRole;
+    return data.role || 'donor';
   }
 
   await ref.set({
@@ -206,11 +209,94 @@ async function upsertUserProfile(user, role = 'donor') {
     blood: '',
     phone: '',
     location: '',
-    donations: role === 'donor' ? 0 : null,
+    donations: 0,
+    status: 'Active',
     date: new Date().toISOString().split('T')[0],
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   });
   return role;
+}
+
+async function fetchUserRole(uid) {
+  const db = getDb();
+  if (!db || !uid) return 'donor';
+  const snap = await db.collection(COLLECTIONS.DONORS).doc(uid).get();
+  if (!snap.exists) return 'donor';
+  return snap.data().role || 'donor';
+}
+
+async function setUserRole(uid, role) {
+  const db = getDb();
+  if (!db || !uid) return role;
+  await db.collection(COLLECTIONS.DONORS).doc(uid).set({ uid, role }, { merge: true });
+  return role;
+}
+
+async function getDonorProfile(uid) {
+  const db = getDb();
+  if (!db || !uid) return null;
+  const snap = await db.collection(COLLECTIONS.DONORS).doc(uid).get();
+  return snap.exists ? { id: snap.id, ...snap.data() } : null;
+}
+
+async function submitDonation(donation) {
+  const db = getDb();
+  if (!db) throw new Error('Database not connected. Please refresh the page.');
+
+  const user = window.auth?.currentUser;
+  if (!user) throw new Error('You must be signed in to register a donation.');
+
+  const units = Math.max(1, parseInt(donation.units, 10) || 1);
+  const donorRef = db.collection(COLLECTIONS.DONORS).doc(user.uid);
+  const donorSnap = await donorRef.get();
+  const currentDonations = donorSnap.exists ? (donorSnap.data().donations || 0) : 0;
+
+  const payload = {
+    uid: user.uid,
+    name: donation.name,
+    blood: donation.blood,
+    location: donation.location,
+    age: donation.age,
+    phone: donation.phone,
+    units,
+    donationDate: donation.donationDate,
+    notes: donation.notes || '',
+    email: user.email || '',
+  };
+
+  await donorRef.set({
+    uid: user.uid,
+    role: 'donor',
+    name: donation.name,
+    blood: donation.blood,
+    location: donation.location,
+    age: donation.age,
+    phone: donation.phone,
+    email: user.email || '',
+    donations: currentDonations + units,
+    status: 'Active',
+    date: donation.donationDate,
+    lastDonation: donation.donationDate,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  try {
+    await db.collection(COLLECTIONS.DONATIONS).add({
+      ...payload,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (donationErr) {
+    const code = donationErr?.code || '';
+    if (code === 'permission-denied') {
+      console.warn('Donation log skipped (deploy firestore.rules for donations collection):', donationErr);
+    } else {
+      throw donationErr;
+    }
+  }
+
+  await refreshDonors();
+  if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
+  return currentDonations + units;
 }
 
 async function upsertDonorProfile(user) {
@@ -401,6 +487,10 @@ window.rankLeaderboardDonors = rankLeaderboardDonors;
 window.reloadNotifications = reloadNotifications;
 window.upsertUserProfile = upsertUserProfile;
 window.upsertDonorProfile = upsertDonorProfile;
+window.fetchUserRole = fetchUserRole;
+window.setUserRole = setUserRole;
+window.getDonorProfile = getDonorProfile;
+window.submitDonation = submitDonation;
 
 // ===== HOME STATS (load + count-up animation) =====
 const counterTimers = {};
