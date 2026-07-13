@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /donors/{donorId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if request.auth != null
+        && (!('uid' in resource.data) || resource.data.uid == request.auth.uid || resource.data.uid == null);
+      // Allow removing seed/test donors (no linked auth account)
+      allow delete: if !('uid' in resource.data) || resource.data.uid == null;
+    }
+
+    match /requests/{requestId} {
+      allow read, create: if true;
+      allow update, delete: if request.auth != null
+        || !('uid' in resource.data);
+    }
+
+    match /notifications/{notifId} {
+      allow read, create, update, delete: if true;
+    }
+
+    match /meta/{docId} {
+      allow read, create, update: if true;
+      allow delete: if false;
+    }
+  }
+}

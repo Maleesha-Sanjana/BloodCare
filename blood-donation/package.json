@@ -1,0 +1,13 @@
+{
+  "name": "bloodcare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/seed-firestore.mjs",
+    "seed:reset": "node scripts/dedupe-firestore.mjs && node scripts/seed-firestore.mjs --reset",
+    "dedupe": "node scripts/dedupe-firestore.mjs"
+  },
+  "dependencies": {
+    "firebase": "^11.0.0"
+  }
+}

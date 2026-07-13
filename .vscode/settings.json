@@ -1,2 +1,6 @@
 {
+  "liveServer.settings.root": "/blood-donation/src/main/webapp",
+  "liveServer.settings.port": 5500,
+  "liveServer.settings.host": "localhost",
+  "liveServer.settings.open": "/index.html"
 }

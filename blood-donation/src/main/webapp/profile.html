@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile — BloodCare</title>
-  <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
@@ -47,91 +47,39 @@
     <button class="hamburger" onclick="toggleMenu()">☰</button>
   </nav>
 
+  <!-- PROFILE -->
+  <section class="section" id="profile">
+    <div class="section-header">
+      <h2 data-i18n="profile_title">My Profile</h2>
+      <p data-i18n="profile_sub">Your BloodCare donor account</p>
+    </div>
 
-  <main class="profile-container">
-    <div class="profile-card">
-      <h1 data-i18n="profile_title">My Profile</h1>
-      <p class="profile-sub" data-i18n="profile_sub">Your BloodCare Account Settings</p>
-      
-      <hr class="profile-divider">
+    <div class="profile-page-card">
+      <img id="profileAvatar" class="profile-page-avatar" alt="" style="display:none" />
+      <h3 class="profile-page-name" id="profileName">—</h3>
+      <p class="profile-page-email" id="profileEmail">—</p>
 
-      <form id="profileSettingsForm">
-        
-        <div class="photo-upload-group">
-          <div class="avatar-card">
-            <div class="avatar-wrapper">
-              <img id="profilePreview" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/component/icl_phone_status_anon.png" alt="Profile Picture">
-              <label for="photoInput" class="upload-overlay">
-                <i class="fas fa-camera camera-icon"></i>
-                <span>Change Photo</span>
-              </label>
-              <input type="file" id="photoInput" accept="image/*" style="display: none;">
-            </div>
-            <div class="avatar-info">
-              <h4>Profile Photo</h4>
-              <p>PNG, JPG or WEBP (Max 2MB)</p>
-              <button type="button" id="removePhotoBtn" class="btn-remove-photo">
-                <i class="fas fa-trash-alt"></i> Remove Photo
-              </button>
-            </div>
-          </div>
+      <div class="profile-details">
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_account">Account</span>
+          <span class="profile-detail-value" id="profileProvider">—</span>
         </div>
-
-        <div class="status-toggle-group">
-          <div class="toggle-container">
-            <span class="toggle-label">Donor Availability:</span>
-            <div class="toggle-switch-wrapper">
-              <span id="statusText" class="status-text active">Active</span>
-              <label class="switch">
-                <input type="checkbox" id="statusToggle" checked>
-                <span class="slider round"></span>
-              </label>
-            </div>
-          </div>
-          <small class="help-text">Switch to 'Inactive' if you are temporarily unavailable to donate blood.</small>
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_verified">Email Verified</span>
+          <span class="profile-detail-value" id="profileVerified">—</span>
         </div>
-
-        <div class="settings-group">
-          <label for="userName">Full Name</label>
-          <input type="text" id="userName" placeholder="Enter your name" required>
+        <div class="profile-detail-item">
+          <span class="profile-detail-label" data-i18n="profile_member">Member Since</span>
+          <span class="profile-detail-value" id="profileSince">—</span>
         </div>
-
-        <div class="settings-group">
-          <label for="userEmail">Email Address</label>
-          <input type="email" id="userEmail" disabled class="disabled-input">
-          <small class="help-text">Email address cannot be modified.</small>
-        </div>
-
-        <div class="password-change-section">
-          <h3>Security & Password <small>(Leave blank if unchanged)</small></h3>
-          
-          <div class="settings-group">
-            <label for="currentPassword">Current Password</label>
-            <input type="password" id="currentPassword" placeholder="Enter current password" autocomplete="current-password">
-          </div>
-
-          <div class="settings-group">
-            <label for="newPassword">New Password</label>
-            <input type="password" id="newPassword" placeholder="Minimum 6 characters" autocomplete="new-password">
-          </div>
-
-          <div class="settings-group">
-            <label for="confirmPassword">Confirm New Password</label>
-            <input type="password" id="confirmPassword" placeholder="Re-enter new password" autocomplete="new-password">
-          </div>
-        </div>
-
-        <button type="submit" class="save-settings-btn">
-          <i class="fas fa-save"></i> Save Changes
-        </button>
-      </form>
+      </div>
 
       <div class="profile-page-actions">
         <a href="index.html" class="btn btn-primary" data-i18n="profile_back">Back to Home</a>
         <button class="btn btn-outline-dark" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
       </div>
     </div>
-  </main>
+  </section>
 
   <footer class="footer">
     <div class="footer-content">
@@ -141,7 +89,29 @@
       </div>
       <p data-i18n="footer_text">Saving lives through technology — Sri Lanka's Blood Donation Network</p>
     </div>
-  </footer>       
+  </footer>
+
+  <div id="notifOverlay" class="notif-overlay">
+    <div id="navNotifPanel" class="nav-notif-panel" onclick="event.stopPropagation()">
+      <div class="nav-notif-header">
+        <div>
+          <h4 data-i18n="notif_title">Notifications</h4>
+          <p class="nav-notif-sub" data-i18n="notif_sub">Stay updated with blood donation alerts</p>
+        </div>
+        <div class="nav-notif-header-actions">
+          <button type="button" class="btn btn-sm btn-outline nav-notif-clear" onclick="clearNotifications()" data-i18n="notif_clear">Clear All</button>
+          <button type="button" id="notifCloseBtn" class="notif-close-btn" aria-label="Close">✕</button>
+        </div>
+      </div>
+      <div class="notif-controls">
+        <button type="button" class="btn btn-outline active" onclick="filterNotif('all', this)" data-i18n="notif_all">All</button>
+        <button type="button" class="btn btn-outline" onclick="filterNotif('emergency', this)" data-i18n="notif_emergency">Emergency</button>
+        <button type="button" class="btn btn-outline" onclick="filterNotif('reminder', this)" data-i18n="notif_reminder">Reminders</button>
+        <button type="button" class="btn btn-outline" onclick="filterNotif('hospital', this)" data-i18n="notif_hospital">Hospital</button>
+      </div>
+      <div id="notifList" class="notif-list nav-notif-list"></div>
+    </div>
+  </div>
 
   <div id="toast" class="toast"></div>
 

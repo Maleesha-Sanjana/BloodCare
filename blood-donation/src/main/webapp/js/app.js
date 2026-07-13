@@ -1,113 +1,18 @@
-// ===== DATA STORE (localStorage) =====
-const DONORS_KEY   = 'bdms_donors';
-const REQUESTS_KEY = 'bdms_requests';
-const NOTIFS_KEY   = 'bdms_notifications';
-
-function loadData(key) {
-  try { return JSON.parse(localStorage.getItem(key)) || []; }
-  catch { return []; }
-}
-
-function saveData(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-// ===== SEED SAMPLE DATA =====
-function seedSampleData() {
-  if (loadData(DONORS_KEY).length === 0) {
-    const sampleDonors = [
-      { id: 1, name: 'Kamal Perera',    age: 28, blood: 'O+',  phone: '+94 71 234 5678', location: 'Colombo',     email: 'kamal@example.com',  date: '2026-01-15' },
-      { id: 2, name: 'Nimal Silva',     age: 35, blood: 'A+',  phone: '+94 77 345 6789', location: 'Kandy',       email: '',                   date: '2026-02-10' },
-      { id: 3, name: 'Priya Rajapaksa', age: 24, blood: 'B+',  phone: '+94 76 456 7890', location: 'Galle',       email: 'priya@example.com',  date: '2026-01-28' },
-      { id: 4, name: 'Saman Fernando',  age: 42, blood: 'AB+', phone: '+94 70 567 8901', location: 'Colombo',     email: '',                   date: '2026-03-05' },
-      { id: 5, name: 'Amara Dissanayake',age:31, blood: 'O-',  phone: '+94 72 678 9012', location: 'Gampaha',     email: 'amara@example.com',  date: '2026-02-20' },
-      { id: 6, name: 'Ravi Kumar',      age: 27, blood: 'B-',  phone: '+94 75 789 0123', location: 'Jaffna',      email: '',                   date: '2026-03-12' },
-      { id: 7, name: 'Dilani Wijesinghe',age:33, blood: 'A-',  phone: '+94 78 890 1234', location: 'Colombo',     email: 'dilani@example.com', date: '2026-01-08' },
-      { id: 8, name: 'Suresh Nair',     age: 29, blood: 'AB-', phone: '+94 71 901 2345', location: 'Trincomalee', email: '',                   date: '2026-03-18' },
-    ];
-    saveData(DONORS_KEY, sampleDonors);
+async function updateStats() {
+  if (typeof window.refreshHomeStats === 'function') {
+    await window.refreshHomeStats();
   }
-
-  if (loadData(REQUESTS_KEY).length === 0) {
-    const sampleRequests = [
-      { id: 1, hospital: 'Colombo National Hospital', blood: 'O+',  location: 'Colombo', contact: '+94 11 269 1111', level: 'critical', units: 3, date: '2026-04-29', time: '08:30' },
-      { id: 2, hospital: 'Kandy Teaching Hospital',   blood: 'A+',  location: 'Kandy',   contact: '+94 81 222 2222', level: 'urgent',   units: 2, date: '2026-04-29', time: '10:15' },
-      { id: 3, hospital: 'Karapitiya Hospital',       blood: 'B-',  location: 'Galle',   contact: '+94 91 222 3333', level: 'normal',   units: 1, date: '2026-04-28', time: '14:00' },
-    ];
-    saveData(REQUESTS_KEY, sampleRequests);
-  }
-
-  if (loadData(NOTIFS_KEY).length === 0) {
-    const sampleNotifs = [
-      { id: 1, type: 'emergency', icon: '🚨', title: 'Emergency: O+ Blood Needed', msg: 'Colombo National Hospital urgently needs O+ blood. 3 units required.', time: '2 hours ago', read: false },
-      { id: 2, type: 'hospital',  icon: '🏥', title: 'New Request: Kandy Hospital', msg: 'Kandy Teaching Hospital posted a request for A+ blood (2 units).', time: '4 hours ago', read: false },
-      { id: 3, type: 'reminder',  icon: '💉', title: 'Donation Reminder', msg: 'It has been 3 months since your last donation. You are eligible to donate again!', time: '1 day ago', read: true },
-      { id: 4, type: 'hospital',  icon: '🏥', title: 'Request Fulfilled', msg: 'Thank you! The B+ blood request from Galle Hospital has been fulfilled.', time: '2 days ago', read: true },
-    ];
-    saveData(NOTIFS_KEY, sampleNotifs);
-  }
-}
-
-// ===== STATS COUNTER ANIMATION =====
-function animateCounter(id, target, duration = 1500) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let start = 0;
-  const step = target / (duration / 16);
-  const timer = setInterval(() => {
-    start += step;
-    if (start >= target) { el.textContent = target; clearInterval(timer); }
-    else { el.textContent = Math.floor(start); }
-  }, 16);
-}
-
-function updateStats() {
-  const donors   = loadData(DONORS_KEY).length;
-  const requests = loadData(REQUESTS_KEY).length;
-  animateCounter('stat-donors',   donors);
-  animateCounter('stat-requests', requests);
-  animateCounter('stat-saved',    Math.floor(donors * 2.3));
-}
-
-// ===== DONOR REGISTRATION =====
-function registerDonor(e) {
-  e.preventDefault();
-  const donor = {
-    id:       Date.now(),
-    name:     document.getElementById('dName').value.trim(),
-    age:      parseInt(document.getElementById('dAge').value),
-    blood:    document.getElementById('dBlood').value,
-    phone:    document.getElementById('dPhone').value.trim(),
-    location: document.getElementById('dLocation').value,
-    email:    document.getElementById('dEmail').value.trim(),
-    date:     new Date().toISOString().split('T')[0],
-  };
-
-  const donors = loadData(DONORS_KEY);
-  donors.push(donor);
-  saveData(DONORS_KEY, donors);
-
-  // Add notification
-  addNotification({
-    type: 'hospital',
-    icon: '✅',
-    title: 'New Donor Registered',
-    msg: `${donor.name} (${donor.blood}) from ${donor.location} has joined the network.`,
-    time: 'Just now',
-    read: false,
-  });
-
-  document.getElementById('donorForm').reset();
-  showToast(t('toast_registered'), 'success');
-  updateStats();
-  renderNotifications();
 }
 
 // ===== DONOR SEARCH =====
 function searchDonors() {
-  const blood    = document.getElementById('sBlood').value;
-  const location = document.getElementById('sLocation').value;
-  const donors   = loadData(DONORS_KEY);
+  const bloodEl    = document.getElementById('sBlood');
+  const locationEl = document.getElementById('sLocation');
+  if (!bloodEl || !locationEl) return;
+
+  const blood    = bloodEl.value;
+  const location = locationEl.value;
+  const donors   = window.getDonors();
 
   const filtered = donors.filter(d => {
     return (!blood    || d.blood    === blood) &&
@@ -126,6 +31,7 @@ function quickSearch(blood) {
 
 function renderDonorResults(donors) {
   const container = document.getElementById('searchResults');
+  if (!container) return;
   if (donors.length === 0) {
     container.innerHTML = `<div class="no-results"><span style="font-size:2.5rem">🔍</span><p>${t('no_donors')}</p></div>`;
     return;
@@ -134,22 +40,22 @@ function renderDonorResults(donors) {
     <div class="donor-card">
       <span class="donor-blood">${d.blood}</span>
       <div class="donor-name">${escHtml(d.name)}</div>
-      <div class="donor-info">📍 ${escHtml(d.location)} &nbsp;|&nbsp; 🎂 ${d.age} yrs</div>
-      <div class="donor-info">📅 Registered: ${d.date}</div>
-      <button class="donor-contact-btn" onclick="showDonorContact(${d.id})">${t('contact_donor')}</button>
+      <div class="donor-info">📍 ${escHtml(d.location)} &nbsp;|&nbsp; 🎂 ${d.age || '—'} yrs</div>
+      <div class="donor-info">📅 Registered: ${d.date || '—'}</div>
+      <button class="donor-contact-btn" onclick="showDonorContact('${d.id}')">${t('contact_donor')}</button>
     </div>
   `).join('');
 }
 
 function showDonorContact(id) {
-  const donor = loadData(DONORS_KEY).find(d => d.id === id);
+  const donor = window.getDonors().find(d => d.id === id);
   if (!donor) return;
   document.getElementById('modalContent').innerHTML = `
     <h3>🩸 ${t('contact_donor')}</h3>
     <p><span class="modal-label">Name</span><br/><strong>${escHtml(donor.name)}</strong></p>
     <p><span class="modal-label">Blood Group</span><br/><strong style="color:var(--red);font-size:1.2rem">${donor.blood}</strong></p>
     <p><span class="modal-label">Location</span><br/>${escHtml(donor.location)}</p>
-    <p><span class="modal-label">Phone</span><br/><a href="tel:${donor.phone}" style="color:var(--red);font-weight:700">${donor.phone}</a></p>
+    <p><span class="modal-label">Phone</span><br/><a href="tel:${donor.phone}" style="color:var(--red);font-weight:700">${donor.phone || '—'}</a></p>
     ${donor.email ? `<p><span class="modal-label">Email</span><br/><a href="mailto:${donor.email}" style="color:var(--red)">${donor.email}</a></p>` : ''}
     <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted)">Please be respectful when contacting donors.</p>
   `;
@@ -158,46 +64,188 @@ function showDonorContact(id) {
 }
 
 // ===== DONATION REQUESTS =====
-function postRequest(e) {
-  e.preventDefault();
+// GPS handled in gps.js (fetchRequestLocation, clearRequestLocation)
+
+function getReqSelectValue(selectId, displayId) {
+  const sel = document.getElementById(selectId);
+  if (sel && sel.value && sel.value.trim()) return sel.value.trim();
+
+  const display = (document.getElementById(displayId)?.textContent || '').trim();
+  if (!display || display.startsWith('--')) return '';
+
+  if (selectId === 'rLevel') {
+    if (/critical/i.test(display)) return 'critical';
+    if (/urgent/i.test(display)) return 'urgent';
+    if (/normal/i.test(display)) return 'normal';
+  }
+
+  if (selectId === 'rBlood') {
+    return display.replace(/\u2212/g, '-').trim();
+  }
+
+  return display.replace(/^📍\s*/, '').trim();
+}
+
+function hidePostSuccess() {
+  const el = document.getElementById('postSuccessAlert');
+  if (el) el.hidden = true;
+}
+
+function showPostSuccess(req) {
+  const el = document.getElementById('postSuccessAlert');
+  const title = document.getElementById('postSuccessTitle');
+  const msg = document.getElementById('postSuccessMsg');
+  if (el) {
+    if (title) title.textContent = t('success_request_title');
+    if (msg) msg.textContent = `${req.hospital} — ${req.blood} (${req.location}) ${t('success_saved_db')}`;
+    el.hidden = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function showSuccessModal(title, message, detailsHtml) {
+  const content = document.getElementById('modalContent');
+  if (!content) {
+    showToast(message, 'success');
+    return;
+  }
+  content.innerHTML = `
+    <div class="success-modal-body">
+      <div class="success-modal-icon">✅</div>
+      <h3 class="success-modal-title">${escHtml(title)}</h3>
+      <p class="success-modal-msg">${escHtml(message)}</p>
+      ${detailsHtml || ''}
+      <button type="button" class="btn btn-primary full-width success-modal-btn" onclick="closeModal()">${t('success_ok')}</button>
+    </div>`;
+  const modal = document.getElementById('modal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.zIndex = '10050';
+  }
+  showToast(message, 'success');
+}
+
+async function postRequest(e) {
+  if (e) e.preventDefault();
+  hidePostSuccess();
+
+  if (typeof window.requireAuthForAction === 'function' && !window.requireAuthForAction('postRequest')) {
+    return;
+  }
+
+  const hospital = document.getElementById('rHospital')?.value.trim() || '';
+  const blood    = getReqSelectValue('rBlood', 'rBloodValue');
+  const location = getReqSelectValue('rLocation', 'rLocationValue');
+  const contact  = document.getElementById('rContact')?.value.trim() || '';
+  const level    = getReqSelectValue('rLevel', 'rLevelValue');
+  const units    = parseInt(document.getElementById('rUnits')?.value, 10);
+
+  if (!hospital || !blood || !location || !contact || !level || !units || units < 1) {
+    showToast(t('req_form_incomplete'), 'error');
+    return;
+  }
+
+  const submitBtn = document.querySelector('#requestForm button[type="submit"]');
+  const prevBtnText = submitBtn?.textContent;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('req_saving');
+  }
+
   const req = {
-    id:       Date.now(),
-    hospital: document.getElementById('rHospital').value.trim(),
-    blood:    document.getElementById('rBlood').value,
-    location: document.getElementById('rLocation').value,
-    contact:  document.getElementById('rContact').value.trim(),
-    level:    document.getElementById('rLevel').value,
-    units:    parseInt(document.getElementById('rUnits').value),
-    date:     new Date().toISOString().split('T')[0],
-    time:     new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
+    hospital,
+    blood,
+    location,
+    contact,
+    level,
+    units,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString('en-LK', { hour: '2-digit', minute: '2-digit' }),
   };
 
-  const requests = loadData(REQUESTS_KEY);
-  requests.unshift(req);
-  saveData(REQUESTS_KEY, requests);
+  const lat = parseFloat(document.getElementById('rLat')?.value);
+  const lng = parseFloat(document.getElementById('rLng')?.value);
+  if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+    req.lat = lat;
+    req.lng = lng;
+  } else if (window.DISTRICT_COORDS?.[location]) {
+    req.lat = window.DISTRICT_COORDS[location][0];
+    req.lng = window.DISTRICT_COORDS[location][1];
+  }
 
-  // Add notification
-  const levelLabel = { critical: '🚨 CRITICAL', urgent: '⚠️ URGENT', normal: '📋 Normal' }[req.level];
-  addNotification({
-    type: req.level === 'critical' ? 'emergency' : 'hospital',
-    icon: req.level === 'critical' ? '🚨' : '🏥',
-    title: `${levelLabel}: ${req.blood} Blood Needed`,
-    msg: `${req.hospital} in ${req.location} needs ${req.units} unit(s) of ${req.blood} blood.`,
-    time: 'Just now',
-    read: false,
-  });
+  try {
+    if (typeof window.addRequest !== 'function') {
+      throw new Error('Database not ready');
+    }
 
-  document.getElementById('requestForm').reset();
-  resetReqDropdowns();
-  showToast(t('toast_request'), 'success');
-  renderRequests();
-  renderNotifications();
-  updateStats();
+    const requestId = await window.addRequest(req);
+    req.id = requestId;
+
+    try {
+      const levelLabel = { critical: '🚨 CRITICAL', urgent: '⚠️ URGENT', normal: '📋 Normal' }[req.level];
+      await window.addNotification({
+        type: req.level === 'critical' ? 'emergency' : 'hospital',
+        icon: req.level === 'critical' ? '🚨' : '🏥',
+        title: `${levelLabel}: ${req.blood} Blood Needed`,
+        msg: `${req.hospital} in ${req.location} needs ${req.units} unit(s) of ${req.blood} blood.`,
+        time: 'Just now',
+        read: false,
+      });
+    } catch (nErr) {
+      console.warn('Notification skipped:', nErr);
+    }
+
+    document.getElementById('requestForm').reset();
+    window.resetReqDropdowns();
+    if (typeof window.clearRequestLocation === 'function') window.clearRequestLocation();
+
+    renderRequests();
+
+    const gpsNote = req.lat != null
+      ? `<p class="success-detail-row">📌 ${t('success_gps_pinned')}</p>`
+      : '';
+
+    showPostSuccess(req);
+    showSuccessModal(
+      t('success_request_title'),
+      t('toast_request'),
+      `<div class="success-details">
+        <p class="success-detail-row"><strong>${escHtml(req.hospital)}</strong></p>
+        <p class="success-detail-row">🩸 ${escHtml(req.blood)} &nbsp;|&nbsp; ${req.units} ${t('req_units').toLowerCase()}</p>
+        <p class="success-detail-row">📍 ${escHtml(req.location)} &nbsp;|&nbsp; <span class="req-badge ${req.level}">${req.level.toUpperCase()}</span></p>
+        ${gpsNote}
+        <p class="success-detail-row muted">${t('success_saved_db')}</p>
+      </div>`
+    );
+
+    if (typeof window.renderRequestMap === 'function') {
+      window.renderRequestMap(null, { forceFit: true });
+      setTimeout(() => {
+        document.getElementById('requestMapSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400);
+    }
+  } catch (err) {
+    console.error('postRequest:', err);
+    showToast(err.message || t('req_post_failed'), 'error');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (prevBtnText) submitBtn.textContent = prevBtnText;
+    }
+  }
+}
+
+function initRequestForm() {
+  const form = document.getElementById('requestForm');
+  if (!form || form.dataset.bound) return;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', postRequest);
 }
 
 function renderRequests() {
-  const requests = loadData(REQUESTS_KEY);
+  const requests = window.getRequests();
   const container = document.getElementById('requestsList');
+  if (!container) return;
   if (requests.length === 0) {
     container.innerHTML = `<div class="no-results"><p>No active requests.</p></div>`;
     return;
@@ -209,14 +257,14 @@ function renderRequests() {
         <span class="req-badge ${r.level}">${r.level.toUpperCase()}</span>
       </div>
       <div class="req-hospital">${escHtml(r.hospital)}</div>
-      <div class="req-details">📍 ${escHtml(r.location)} &nbsp;|&nbsp; 🩸 ${r.units} unit(s) &nbsp;|&nbsp; 📅 ${r.date} ${r.time}</div>
-      <button class="req-respond-btn" onclick="respondToRequest(${r.id})">${t('respond_request')}</button>
+      <div class="req-details">📍 ${escHtml(r.location)}${r.lat != null ? ' 📌' : ''} &nbsp;|&nbsp; 🩸 ${r.units} unit(s) &nbsp;|&nbsp; 📅 ${r.date} ${r.time}</div>
+      <button class="req-respond-btn" onclick="respondToRequest('${r.id}')">${t('respond_request')}</button>
     </div>
   `).join('');
 }
 
 function respondToRequest(id) {
-  const req = loadData(REQUESTS_KEY).find(r => r.id === id);
+  const req = window.getRequests().find(r => r.id === id);
   if (!req) return;
   document.getElementById('modalContent').innerHTML = `
     <h3>🏥 ${t('respond_request')}</h3>
@@ -231,76 +279,29 @@ function respondToRequest(id) {
   openModal();
 }
 
-// ===== NOTIFICATIONS =====
-let currentFilter = 'all';
-
-function addNotification(notif) {
-  const notifs = loadData(NOTIFS_KEY);
-  notifs.unshift({ id: Date.now(), ...notif });
-  saveData(NOTIFS_KEY, notifs.slice(0, 50)); // keep max 50
-}
-
-function filterNotif(type) {
-  currentFilter = type;
-  document.querySelectorAll('.notif-controls .btn-outline').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  event.target.classList.add('active');
-  renderNotifications();
-}
-
-function renderNotifications() {
-  const all = loadData(NOTIFS_KEY);
-  const filtered = currentFilter === 'all' ? all : all.filter(n => n.type === currentFilter);
-  const container = document.getElementById('notifList');
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔔</div>
-        <p>${t('no_notif')}</p>
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(n => `
-    <div class="notif-item ${n.type} ${n.read ? '' : 'unread'}" id="notif-${n.id}">
-      <span class="notif-icon">${n.icon}</span>
-      <div class="notif-body">
-        <div class="notif-title">${escHtml(n.title)}</div>
-        <div class="notif-msg">${escHtml(n.msg)}</div>
-        <div class="notif-time">${n.time}</div>
-      </div>
-      <button class="notif-dismiss" onclick="dismissNotif(${n.id})" title="Dismiss">✕</button>
-    </div>
-  `).join('');
-}
-
-function dismissNotif(id) {
-  const notifs = loadData(NOTIFS_KEY).filter(n => n.id !== id);
-  saveData(NOTIFS_KEY, notifs);
-  renderNotifications();
-}
-
-function clearNotifications() {
-  saveData(NOTIFS_KEY, []);
-  renderNotifications();
-  showToast(t('toast_cleared'), 'info');
-}
-
 // ===== TOAST =====
 let toastTimer;
 function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast');
+  if (!toast) return;
   toast.textContent = msg;
   toast.className = `toast ${type} show`;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+  toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 4500);
 }
+
+// Canonical toast for all scripts
+window.showToast = showToast;
 
 // ===== MODAL =====
 function openModal()  { document.getElementById('modal').classList.add('open'); }
-function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.zIndex = '';
+  }
+}
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
@@ -309,7 +310,6 @@ function toggleMenu() {
   document.querySelector('.nav-links').classList.toggle('open');
 }
 
-// Close mobile menu on link click
 document.querySelectorAll('.nav-links a').forEach(a => {
   a.addEventListener('click', () => {
     document.querySelector('.nav-links').classList.remove('open');
@@ -318,7 +318,10 @@ document.querySelectorAll('.nav-links a').forEach(a => {
 
 // ===== ACTIVE NAV HIGHLIGHT =====
 function highlightNav() {
-  const sections = ['home','register','search','requests','notifications'];
+  const loggedIn = window.auth && window.auth.currentUser;
+  const sections = loggedIn
+    ? ['home', 'quickSearch', 'donorWelcome', 'requestMapSection', 'search', 'requests', 'leaderboard']
+    : ['home', 'quickSearch', 'requestMapSection', 'search', 'requests', 'leaderboard'];
   const scrollY = window.scrollY + 80;
   sections.forEach(id => {
     const el = document.getElementById(id);
@@ -341,153 +344,45 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ===== CUSTOM DROPDOWNS (Search section) =====
-function toggleDropdown(which) {
-  const wrap = document.getElementById(which + 'Wrap');
-  const isOpen = wrap.classList.contains('open');
-  // close all first
-  document.querySelectorAll('.custom-select-wrap').forEach(w => w.classList.remove('open'));
-  if (!isOpen) wrap.classList.add('open');
-}
+// ===== CUSTOM DROPDOWNS (handled in dropdowns.js) =====
 
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.custom-select-wrap')) {
-    document.querySelectorAll('.custom-select-wrap').forEach(w => w.classList.remove('open'));
+function startAppListeners() {
+  window.subscribeDonors(() => {
+    searchDonors();
+    updateStats();
+  });
+  window.subscribeRequests(() => {
+    renderRequests();
+    updateStats();
+    if (typeof window.renderRequestMap === 'function') window.renderRequestMap();
+  });
+  if (typeof window.subscribeNotifications === 'function') {
+    window.subscribeNotifications(() => {
+      if (typeof window.renderNotifications === 'function') window.renderNotifications();
+      if (typeof window.updateNotifBadge === 'function') window.updateNotifBadge();
+    });
   }
+}
+
+window.bootApp = function () {
+  startAppListeners();
+  initRequestForm();
+  if (typeof window.initGpsButton === 'function') window.initGpsButton();
+  if (document.getElementById('requestsList')) renderRequests();
+  if (document.getElementById('searchResults')) searchDonors();
+  if (typeof window.initNotificationUI === 'function') window.initNotificationUI();
+  if (typeof window.initRequestMap === 'function') window.initRequestMap();
+  if (typeof window.initLeaderboard === 'function') window.initLeaderboard();
+};
+
+Object.assign(window, {
+  quickSearch, searchDonors, postRequest, hidePostSuccess,
+  showDonorContact, respondToRequest, showSuccessModal, openModal, closeModal, toggleMenu,
+  renderRequests,
 });
 
-function pickBlood(el, value, label) {
-  // update hidden select
-  document.getElementById('sBlood').value = value;
-  // update trigger label
-  document.getElementById('bloodValue').textContent = label;
-  // toggle has-value
-  const wrap = document.getElementById('bloodWrap');
-  wrap.classList.toggle('has-value', value !== '');
-  // mark selected
-  document.querySelectorAll('#bloodDropdown .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  el.classList.add('cs-selected');
-  el.querySelector('.cs-check').textContent = '✓';
-  // close
-  wrap.classList.remove('open');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRequestForm);
+} else {
+  initRequestForm();
 }
-
-function pickLocation(el, value, label) {
-  document.getElementById('sLocation').value = value;
-  document.getElementById('locationValue').textContent = label;
-  const wrap = document.getElementById('locationWrap');
-  wrap.classList.toggle('has-value', value !== '');
-  document.querySelectorAll('#locationOptionsList .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  el.classList.add('cs-selected');
-  el.querySelector('.cs-check').textContent = '✓';
-  wrap.classList.remove('open');
-  // clear search input
-  const searchEl = document.querySelector('#locationDropdown .cs-search');
-  if (searchEl) { searchEl.value = ''; filterLocationOptions(''); }
-}
-
-function filterLocationOptions(query) {
-  const q = query.toLowerCase();
-  document.querySelectorAll('#locationOptionsList .cs-option').forEach(o => {
-    const text = o.textContent.toLowerCase();
-    o.classList.toggle('cs-hidden', q !== '' && !text.includes(q));
-  });
-}
-
-// ===== POST REQUEST FORM DROPDOWNS =====
-function pickReqBlood(el, value, label) {
-  document.getElementById('rBlood').value = value;
-  document.getElementById('rBloodValue').textContent = label;
-  const wrap = document.getElementById('rBloodWrap');
-  wrap.classList.toggle('has-value', value !== '');
-  document.querySelectorAll('#rBloodDropdown .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  el.classList.add('cs-selected');
-  el.querySelector('.cs-check').textContent = '✓';
-  wrap.classList.remove('open');
-}
-
-function pickReqLocation(el, value) {
-  document.getElementById('rLocation').value = value;
-  document.getElementById('rLocationValue').textContent = value;
-  const wrap = document.getElementById('rLocationWrap');
-  wrap.classList.toggle('has-value', value !== '');
-  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  el.classList.add('cs-selected');
-  el.querySelector('.cs-check').textContent = '✓';
-  wrap.classList.remove('open');
-  const searchEl = document.querySelector('#rLocationDropdown .cs-search');
-  if (searchEl) { searchEl.value = ''; filterReqLocationOptions(''); }
-}
-
-function filterReqLocationOptions(query) {
-  const q = query.toLowerCase();
-  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
-    const text = o.textContent.toLowerCase();
-    o.classList.toggle('cs-hidden', q !== '' && !text.includes(q));
-  });
-}
-
-function pickReqLevel(el, value, label) {
-  document.getElementById('rLevel').value = value;
-  document.getElementById('rLevelValue').textContent = label;
-  const wrap = document.getElementById('rLevelWrap');
-  wrap.classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
-  wrap.classList.add('has-value', 'level-' + value);
-  document.querySelectorAll('#rLevelDropdown .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  el.classList.add('cs-selected');
-  el.querySelector('.cs-check').textContent = '✓';
-  wrap.classList.remove('open');
-}
-
-// Reset request form custom dropdowns after submit
-function resetReqDropdowns() {
-  // Blood
-  document.getElementById('rBloodValue').textContent = '-- Select --';
-  document.getElementById('rBloodWrap').classList.remove('has-value');
-  document.querySelectorAll('#rBloodDropdown .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  // Location
-  document.getElementById('rLocationValue').textContent = '-- Select District --';
-  document.getElementById('rLocationWrap').classList.remove('has-value');
-  document.querySelectorAll('#rLocationOptionsList .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-  // Level
-  document.getElementById('rLevelValue').textContent = '-- Select --';
-  const lw = document.getElementById('rLevelWrap');
-  lw.classList.remove('has-value', 'level-critical', 'level-urgent', 'level-normal');
-  document.querySelectorAll('#rLevelDropdown .cs-option').forEach(o => {
-    o.classList.remove('cs-selected');
-    o.querySelector('.cs-check').textContent = '';
-  });
-}
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  seedSampleData();
-  updateStats();
-  renderRequests();
-  renderNotifications();
-
-  // Initial search shows all donors
-  searchDonors();
-});

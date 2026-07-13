@@ -1,0 +1,23 @@
+{
+  "donors": [
+    { "name": "Kamal Perera",      "age": 28, "blood": "O+",  "phone": "+94 71 234 5678", "location": "Colombo",     "email": "kamal@example.com",  "donations": 12, "date": "2026-01-15" },
+    { "name": "Nimal Silva",       "age": 35, "blood": "A+",  "phone": "+94 77 345 6789", "location": "Kandy",       "email": "",                   "donations": 9,  "date": "2026-02-10" },
+    { "name": "Priya Rajapaksa",   "age": 24, "blood": "B+",  "phone": "+94 76 456 7890", "location": "Galle",       "email": "priya@example.com",  "donations": 10, "date": "2026-01-28" },
+    { "name": "Saman Fernando",    "age": 42, "blood": "AB+", "phone": "+94 70 567 8901", "location": "Colombo",     "email": "",                   "donations": 4,  "date": "2026-03-05" },
+    { "name": "Amara Dissanayake", "age": 31, "blood": "O-",  "phone": "+94 72 678 9012", "location": "Gampaha",     "email": "amara@example.com",  "donations": 7,  "date": "2026-02-20" },
+    { "name": "Ravi Kumar",        "age": 27, "blood": "B-",  "phone": "+94 75 789 0123", "location": "Jaffna",      "email": "",                   "donations": 6,  "date": "2026-03-12" },
+    { "name": "Dilani Wijesinghe", "age": 33, "blood": "A-",  "phone": "+94 78 890 1234", "location": "Colombo",     "email": "dilani@example.com", "donations": 5,  "date": "2026-01-08" },
+    { "name": "Suresh Nair",       "age": 29, "blood": "AB-", "phone": "+94 71 901 2345", "location": "Trincomalee", "email": "",                   "donations": 3,  "date": "2026-03-18" }
+  ],
+  "requests": [
+    { "hospital": "Colombo National Hospital", "blood": "O+", "location": "Colombo", "contact": "+94 11 269 1111", "level": "critical", "units": 3, "date": "2026-04-29", "time": "08:30", "lat": 6.9147, "lng": 79.8613 },
+    { "hospital": "Kandy Teaching Hospital",   "blood": "A+", "location": "Kandy",   "contact": "+94 81 222 2222", "level": "urgent",   "units": 2, "date": "2026-04-29", "time": "10:15", "lat": 7.2914, "lng": 80.6368 },
+    { "hospital": "Karapitiya Hospital",       "blood": "B-", "location": "Galle",   "contact": "+94 91 222 3333", "level": "normal",   "units": 1, "date": "2026-04-28", "time": "14:00", "lat": 6.0580, "lng": 80.2175 }
+  ],
+  "notifications": [
+    { "type": "emergency", "icon": "🚨", "title": "Emergency: O+ Blood Needed",      "msg": "Colombo National Hospital urgently needs O+ blood. 3 units required.",                    "time": "2 hours ago", "read": false },
+    { "type": "hospital",  "icon": "🏥", "title": "New Request: Kandy Hospital",     "msg": "Kandy Teaching Hospital posted a request for A+ blood (2 units).",                        "time": "4 hours ago", "read": false },
+    { "type": "reminder",  "icon": "💉", "title": "Donation Reminder",               "msg": "It has been 3 months since your last donation. You are eligible to donate again!",        "time": "1 day ago",   "read": true },
+    { "type": "hospital",  "icon": "🏥", "title": "Request Fulfilled",               "msg": "Thank you! The B+ blood request from Galle Hospital has been fulfilled.",               "time": "2 days ago",  "read": true }
+  ]
+}
