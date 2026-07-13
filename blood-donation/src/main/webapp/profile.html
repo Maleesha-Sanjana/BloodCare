@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile — BloodCare</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/profile.css" />
 </head>
 <body>
 
@@ -47,39 +47,92 @@
     <button class="hamburger" onclick="toggleMenu()">☰</button>
   </nav>
 
-  <!-- PROFILE -->
-  <section class="section" id="profile">
-    <div class="section-header">
-      <h2 data-i18n="profile_title">My Profile</h2>
-      <p data-i18n="profile_sub">Your BloodCare donor account</p>
-    </div>
+  <main class="profile-container">
+    <div class="profile-card">
+      <h1 data-i18n="profile_title">My Profile</h1>
+      <p class="profile-sub" data-i18n="profile_sub">Your BloodCare Account Settings</p>
 
-    <div class="profile-page-card">
-      <img id="profileAvatar" class="profile-page-avatar" alt="" style="display:none" />
-      <h3 class="profile-page-name" id="profileName">—</h3>
-      <p class="profile-page-email" id="profileEmail">—</p>
+      <hr class="profile-divider">
 
-      <div class="profile-details">
-        <div class="profile-detail-item">
-          <span class="profile-detail-label" data-i18n="profile_account">Account</span>
-          <span class="profile-detail-value" id="profileProvider">—</span>
+      <form id="profileSettingsForm">
+        <div class="photo-upload-group">
+          <div class="avatar-card">
+            <div class="avatar-wrapper">
+              <img id="profilePreview" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/component/icl_phone_status_anon.png" alt="Profile Picture">
+              <label for="photoInput" class="upload-overlay">
+                <span class="camera-icon">📷</span>
+                <span data-i18n="profile_change_photo">Change Photo</span>
+              </label>
+              <input type="file" id="photoInput" accept="image/*" style="display: none;">
+            </div>
+            <div class="avatar-info">
+              <h4 data-i18n="profile_photo_title">Profile Photo</h4>
+              <p data-i18n="profile_photo_hint">PNG, JPG or WEBP (Max 2MB)</p>
+              <button type="button" id="removePhotoBtn" class="btn-remove-photo">
+                🗑️ <span data-i18n="profile_remove_photo">Remove Photo</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="profile-detail-item">
-          <span class="profile-detail-label" data-i18n="profile_verified">Email Verified</span>
-          <span class="profile-detail-value" id="profileVerified">—</span>
+
+        <div class="status-toggle-group">
+          <div class="toggle-container">
+            <span class="toggle-label" data-i18n="profile_availability">Donor Availability:</span>
+            <div class="toggle-switch-wrapper">
+              <span id="statusText" class="status-text active" data-i18n="profile_status_active">Active</span>
+              <label class="switch">
+                <input type="checkbox" id="statusToggle" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          <small class="help-text" data-i18n="profile_status_hint">Switch to 'Inactive' if you are temporarily unavailable to donate blood.</small>
         </div>
-        <div class="profile-detail-item">
-          <span class="profile-detail-label" data-i18n="profile_member">Member Since</span>
-          <span class="profile-detail-value" id="profileSince">—</span>
+
+        <div class="settings-group">
+          <label for="userName" data-i18n="profile_full_name">Full Name</label>
+          <input type="text" id="userName" placeholder="Enter your name" required>
         </div>
-      </div>
+
+        <div class="settings-group">
+          <label for="userEmail" data-i18n="auth_email">Email Address</label>
+          <input type="email" id="userEmail" disabled class="disabled-input">
+          <small class="help-text" data-i18n="profile_email_locked">Email address cannot be modified.</small>
+        </div>
+
+        <div class="password-change-section" id="passwordSection">
+          <h3>
+            <span data-i18n="profile_security">Security &amp; Password</span>
+            <small data-i18n="profile_password_hint">(Leave blank if unchanged)</small>
+          </h3>
+
+          <div class="settings-group">
+            <label for="currentPassword" data-i18n="profile_current_password">Current Password</label>
+            <input type="password" id="currentPassword" placeholder="Enter current password" autocomplete="current-password">
+          </div>
+
+          <div class="settings-group">
+            <label for="newPassword" data-i18n="profile_new_password">New Password</label>
+            <input type="password" id="newPassword" placeholder="Minimum 6 characters" autocomplete="new-password">
+          </div>
+
+          <div class="settings-group">
+            <label for="confirmPassword" data-i18n="profile_confirm_password">Confirm New Password</label>
+            <input type="password" id="confirmPassword" placeholder="Re-enter new password" autocomplete="new-password">
+          </div>
+        </div>
+
+        <button type="submit" class="save-settings-btn">
+          💾 <span data-i18n="profile_save">Save Changes</span>
+        </button>
+      </form>
 
       <div class="profile-page-actions">
         <a href="index.html" class="btn btn-primary" data-i18n="profile_back">Back to Home</a>
-        <button class="btn btn-outline-dark" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
+        <button type="button" class="btn btn-outline-dark" onclick="signOut()" data-i18n="auth_signout">Sign Out</button>
       </div>
     </div>
-  </section>
+  </main>
 
   <footer class="footer">
     <div class="footer-content">
@@ -118,12 +171,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/i18n.js?v=25"></script>
-  <script src="js/firebase-config.js?v=25"></script>
-  <script src="js/firestore-db.js?v=25"></script>
-  <script src="js/notifications.js?v=25"></script>
-  <script src="js/auth.js?v=25"></script>
-  <script src="js/app.js?v=25"></script>
-  <script src="js/profile.js?v=25"></script>
+  <script src="js/i18n.js?v=26"></script>
+  <script src="js/firebase-config.js?v=26"></script>
+  <script src="js/firestore-db.js?v=26"></script>
+  <script src="js/notifications.js?v=26"></script>
+  <script src="js/auth.js?v=26"></script>
+  <script src="js/app.js?v=26"></script>
+  <script src="js/profile.js?v=26"></script>
 </body>
 </html>
