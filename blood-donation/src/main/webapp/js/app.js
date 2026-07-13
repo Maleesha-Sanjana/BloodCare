@@ -86,6 +86,20 @@ function getReqSelectValue(selectId, displayId) {
   return display.replace(/^📍\s*/, '').trim();
 }
 
+function getDonSelectValue(selectId, displayId) {
+  const sel = document.getElementById(selectId);
+  if (sel && sel.value && sel.value.trim()) return sel.value.trim();
+
+  const display = (document.getElementById(displayId)?.textContent || '').trim();
+  if (!display || display.startsWith('--')) return '';
+
+  if (selectId === 'dBlood') {
+    return display.replace(/\u2212/g, '-').trim();
+  }
+
+  return display.replace(/^📍\s*/, '').trim();
+}
+
 function hidePostSuccess() {
   const el = document.getElementById('postSuccessAlert');
   if (el) el.hidden = true;
@@ -242,6 +256,165 @@ function initRequestForm() {
   form.addEventListener('submit', postRequest);
 }
 
+// ===== DONOR DONATION FORM =====
+function hideDonSuccess() {
+  const el = document.getElementById('donSuccessAlert');
+  if (el) el.hidden = true;
+}
+
+function showDonSuccess(donation, totalDonations) {
+  const el = document.getElementById('donSuccessAlert');
+  const title = document.getElementById('donSuccessTitle');
+  const msg = document.getElementById('donSuccessMsg');
+  if (el) {
+    if (title) title.textContent = t('don_success_title');
+    if (msg) {
+      msg.textContent = `${donation.blood} — ${donation.units} ${t('lb_donations')} (${t('don_success_leaderboard').replace('{count}', totalDonations)})`;
+    }
+    el.hidden = false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function updateFormsByRole(role, isLoggedIn) {
+  const isDonor = isLoggedIn && role === 'donor';
+  const donorCard = document.getElementById('donorFormCard');
+  const recipientCard = document.getElementById('recipientFormCard');
+  const title = document.getElementById('requestsSectionTitle');
+  const sub = document.getElementById('requestsSectionSub');
+  const navDonate = document.getElementById('navDonateLink');
+  const navRequests = document.getElementById('navRequestsLink');
+
+  if (donorCard) donorCard.style.display = isDonor ? '' : 'none';
+  if (recipientCard) recipientCard.style.display = isDonor ? 'none' : '';
+
+  if (title) title.textContent = t(isDonor ? 'don_section_title' : 'req_title');
+  if (sub) sub.textContent = t(isDonor ? 'don_section_sub' : 'req_sub');
+
+  if (navDonate) navDonate.style.display = isDonor ? '' : 'none';
+  if (navRequests) navRequests.style.display = isDonor ? 'none' : '';
+
+  if (isDonor) prefillDonationForm();
+}
+
+async function prefillDonationForm() {
+  const user = window.auth?.currentUser;
+  if (!user) return;
+
+  const nameEl = document.getElementById('dName');
+  if (nameEl && !nameEl.value.trim()) {
+    nameEl.value = user.displayName || user.email?.split('@')[0] || '';
+  }
+
+  if (typeof window.getDonorProfile !== 'function') return;
+  try {
+    const profile = await window.getDonorProfile(user.uid);
+    if (!profile) return;
+
+    if (profile.name && nameEl) nameEl.value = profile.name;
+    if (profile.age) document.getElementById('dAge').value = profile.age;
+    if (profile.phone) document.getElementById('dPhone').value = profile.phone;
+
+    if (profile.blood) {
+      const bloodOpt = document.querySelector(`#dBloodDropdown .cs-option[data-value="${profile.blood}"]`);
+      if (bloodOpt) bloodOpt.click();
+    }
+    if (profile.location) {
+      const locOpt = document.querySelector(`#dLocationOptionsList .cs-option[data-value="${profile.location}"]`);
+      if (locOpt) locOpt.click();
+    }
+  } catch (err) {
+    console.warn('prefillDonationForm:', err);
+  }
+}
+
+function initDonationForm() {
+  const form = document.getElementById('donationForm');
+  if (!form || form.dataset.bound) return;
+  form.dataset.bound = '1';
+
+  const dateEl = document.getElementById('dDate');
+  if (dateEl && !dateEl.value) {
+    dateEl.value = new Date().toISOString().split('T')[0];
+  }
+
+  form.addEventListener('submit', registerDonation);
+}
+
+async function registerDonation(e) {
+  if (e) e.preventDefault();
+  hideDonSuccess();
+
+  if (!window.auth?.currentUser) {
+    if (typeof window.requireAuthForAction === 'function') {
+      window.requireAuthForAction('donor');
+    }
+    return;
+  }
+
+  const name = document.getElementById('dName')?.value.trim() || '';
+  const blood = getDonSelectValue('dBlood', 'dBloodValue');
+  const location = getDonSelectValue('dLocation', 'dLocationValue');
+  const age = parseInt(document.getElementById('dAge')?.value, 10);
+  const phone = document.getElementById('dPhone')?.value.trim() || '';
+  const units = parseInt(document.getElementById('dUnits')?.value, 10);
+  const donationDate = document.getElementById('dDate')?.value || '';
+  const notes = document.getElementById('dNotes')?.value.trim() || '';
+
+  if (!name || !blood || !location || !age || age < 18 || !phone || !donationDate || !units || units < 1) {
+    showToast(t('don_form_incomplete'), 'error');
+    return;
+  }
+
+  const submitBtn = document.querySelector('#donationForm button[type="submit"]');
+  const prevBtnText = submitBtn?.textContent;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('don_saving');
+  }
+
+  const donation = { name, blood, location, age, phone, units, donationDate, notes };
+
+  try {
+    if (typeof window.submitDonation !== 'function') {
+      throw new Error('Database not ready');
+    }
+
+    const totalDonations = await window.submitDonation(donation);
+
+    if (typeof window.searchDonors === 'function') window.searchDonors();
+    if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
+
+    showDonSuccess(donation, totalDonations);
+    showSuccessModal(
+      t('don_success_title'),
+      t('don_success_msg'),
+      `<div class="success-details">
+        <p class="success-detail-row"><strong>${escHtml(donation.name)}</strong></p>
+        <p class="success-detail-row">🩸 ${escHtml(donation.blood)} &nbsp;|&nbsp; ${donation.units} ${t('lb_donations')}</p>
+        <p class="success-detail-row">📍 ${escHtml(donation.location)} &nbsp;|&nbsp; 📅 ${donation.donationDate}</p>
+        <p class="success-detail-row muted">${t('don_success_leaderboard').replace('{count}', totalDonations)}</p>
+      </div>`
+    );
+
+    document.getElementById('dDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('dNotes').value = '';
+  } catch (err) {
+    console.error('registerDonation:', err);
+    const code = err?.code || '';
+    if (code === 'permission-denied') {
+      showToast(t('don_permission_denied'), 'error');
+    } else {
+      showToast(err.message || t('don_submit_failed'), 'error');
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      if (prevBtnText) submitBtn.textContent = prevBtnText;
+    }
+  }
+}
+
 function renderRequests() {
   const requests = window.getRequests();
   const container = document.getElementById('requestsList');
@@ -367,6 +540,11 @@ function startAppListeners() {
 window.bootApp = function () {
   startAppListeners();
   initRequestForm();
+  initDonationForm();
+  updateFormsByRole(
+    typeof window.getUserRole === 'function' ? window.getUserRole() : 'donor',
+    !!(window.auth && window.auth.currentUser)
+  );
   if (typeof window.initGpsButton === 'function') window.initGpsButton();
   if (document.getElementById('requestsList')) renderRequests();
   if (document.getElementById('searchResults')) searchDonors();
@@ -377,12 +555,17 @@ window.bootApp = function () {
 
 Object.assign(window, {
   quickSearch, searchDonors, postRequest, hidePostSuccess,
+  registerDonation, hideDonSuccess, updateFormsByRole, prefillDonationForm,
   showDonorContact, respondToRequest, showSuccessModal, openModal, closeModal, toggleMenu,
   renderRequests,
 });
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initRequestForm);
+  document.addEventListener('DOMContentLoaded', () => {
+    initRequestForm();
+    initDonationForm();
+  });
 } else {
   initRequestForm();
+  initDonationForm();
 }

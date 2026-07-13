@@ -4,10 +4,8 @@ service cloud.firestore {
 
     match /donors/{donorId} {
       allow read: if true;
-      allow create: if true;
-      allow update: if request.auth != null
-        && (!('uid' in resource.data) || resource.data.uid == request.auth.uid || resource.data.uid == null);
-      // Allow removing seed/test donors (no linked auth account)
+      allow create: if request.auth != null && request.auth.uid == donorId;
+      allow update: if request.auth != null && request.auth.uid == donorId;
       allow delete: if !('uid' in resource.data) || resource.data.uid == null;
     }
 
@@ -15,6 +13,14 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if request.auth != null
         || !('uid' in resource.data);
+    }
+
+    match /donations/{donationId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
     }
 
     match /notifications/{notifId} {
